@@ -1,0 +1,109 @@
+<!doctype html>
+<!--
+  GTS development updates — a static page served by GitHub Pages.
+  WHAT: renders the weekly updates listed in data/updates.js (newest first) and the roadmap ribbon.
+  HOW: no build step and no framework; js/app.js reads window.GTS_UPDATES and fills the <main>.
+  PUBLIC: this repository is public. Product progress only — no costs, legal research, business
+  model, dates promised to partners or personal data.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GTS Updates</title>
+    <meta name="description" content="Weekly development updates from GTS: safe school journeys, tracked live." />
+    <meta name="theme-color" content="#070B1F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F3F6FC" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Anek Latin: the typeface of the GTS app (Ek Type, an Indian foundry). Width axis for the
+         wide display style the app uses. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,300..800&display=swap"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="sky" aria-hidden="true"><div class="sky__body"></div></div>
+
+    <header class="masthead">
+      <a class="brand" href="./" aria-label="GTS updates home">
+        <span class="brand__tile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-van" /></svg>
+        </span>
+        <span class="brand__name">GTS</span>
+      </a>
+      <p class="masthead__greeting" id="greeting"></p>
+    </header>
+
+    <main id="app">
+      <section class="intro">
+        <h1 class="intro__title">Building GTS, week by week</h1>
+        <p class="intro__lede">
+          GTS lets parents see their child's school van live and get an alert when it is near home or
+          at school. This page shows what was built each week, with screenshots from a real phone.
+        </p>
+        <figure class="roadmap" id="roadmap" aria-label="Roadmap"></figure>
+      </section>
+
+      <div id="weeks"></div>
+      <noscript><p class="noscript">This page needs JavaScript to show the updates.</p></noscript>
+    </main>
+
+    <footer class="footer">
+      <p>GTS — Go to Shore. Screens show demo data; no real children or trips.</p>
+    </footer>
+
+    <dialog class="lightbox" id="lightbox" aria-label="Screenshot">
+      <button class="lightbox__close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close" /></svg>
+      </button>
+      <img class="lightbox__image" alt="" />
+      <p class="lightbox__caption"></p>
+    </dialog>
+
+    <!-- Icon sprite (Phosphor-style duotone/fill shapes, drawn for this page). -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <symbol id="icon-van" viewBox="0 0 24 24">
+        <path d="M3 7a2 2 0 0 1 2-2h11.6a2 2 0 0 1 1.7.95L21 10.5V16a1 1 0 0 1-1 1h-1.2a2.5 2.5 0 0 1-4.6 0H9.8a2.5 2.5 0 0 1-4.6 0H4a1 1 0 0 1-1-1V7Zm2 .5V10h4V7.5H5Zm6 0V10h4V7.5h-4Zm6 0V10h2.4l-1.5-2.5H17Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-radar" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+        <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.8" opacity=".6" />
+        <path d="M12 12 18.4 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-bell" viewBox="0 0 24 24">
+        <path d="M12 3a6 6 0 0 0-6 6v3.6l-1.6 2.7A1 1 0 0 0 5.3 17h13.4a1 1 0 0 0 .9-1.7L18 12.6V9a6 6 0 0 0-6-6Zm-2.2 15a2.4 2.4 0 0 0 4.4 0H9.8Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+        <path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-moon" viewBox="0 0 24 24">
+        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-language" viewBox="0 0 24 24">
+        <path d="M4 5h9M8.5 3v2M6 5c.6 3 2.8 5.6 6 7M11 5c-.8 3.4-3.2 6.2-7 7.6M13 21l4-9 4 9M14.4 18h5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24">
+        <path d="M12 2.5 4.5 5.3v6.1c0 4.6 3.1 8.6 7.5 10.1 4.4-1.5 7.5-5.5 7.5-10.1V5.3L12 2.5Zm-1.1 13.1-3.2-3.2 1.4-1.4 1.8 1.8 4.1-4.1 1.4 1.4-5.5 5.5Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-phone" viewBox="0 0 24 24">
+        <rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+        <circle cx="12" cy="18" r="1.1" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+      </symbol>
+    </svg>
+
+    <script src="data/updates.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

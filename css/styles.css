@@ -1,0 +1,619 @@
+/*
+  GTS updates — styles.
+  WHAT: the same design language as the GTS app: night/day colour roles, school-van amber as the
+  brand, the Anek typeface, and a living sky that follows the visitor's time of day.
+  WHERE the sky comes from: js/app.js sets data-sky="dawn|day|dusk|night" on <html>; the visitor's
+  light/dark setting (prefers-color-scheme) picks the tone of that sky.
+*/
+
+/* ---------- Colour roles (same values as GtsColors in the app) ---------- */
+:root {
+  color-scheme: light dark;
+
+  /* Day set: cool white with indigo ink. */
+  --background: #f3f6fc;
+  --panel: #ffffff;
+  --panel-raised: #e9eef9;
+  --hairline: #d9e0f0;
+  --brand: #ffc233;
+  --brand-deep: #f59e0b;
+  --on-brand: #1b1300;
+  --brand-ink: #8a5a00;
+  --live: #0277a8;
+  --success: #0b7f55;
+  --ink: #0b1233;
+  --ink-muted: #4b5578;
+  --ink-faint: #a9b2ce;
+  --glow: 0.28;
+
+  /* Living sky, day tone (overridden per phase below). */
+  --sky-zenith: #9ccbff;
+  --sky-horizon: #eaf4ff;
+  --sky-body: #fff4c2;
+  --sky-body-x: 78%;
+  --sky-body-y: 9%;
+
+  /* Spacing scale (8 / 16 / 24 / 32 / 64) and type. */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 64px;
+  --radius-panel: 28px;
+  --font: "Anek Latin", system-ui, sans-serif;
+  --measure: 68ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Night set: deep indigo sky, glowing accents. */
+    --background: #070b1f;
+    --panel: #10173a;
+    --panel-raised: #1a2350;
+    --hairline: #2a3468;
+    --brand-ink: #ffc233;
+    --live: #40d9ff;
+    --success: #3ee6a0;
+    --ink: #f2f4ff;
+    --ink-muted: #a3acd6;
+    --ink-faint: #4a5488;
+    --glow: 0.55;
+    --sky-zenith: #0a1a3f;
+    --sky-horizon: #12305c;
+    --sky-body: #ffe9a8;
+  }
+}
+
+/* ---------- Living sky: one block per phase, light then dark ---------- */
+html[data-sky="dawn"] { --sky-zenith: #bfd8f6; --sky-horizon: #ffdcc6; --sky-body: #ffb070; --sky-body-x: 22%; --sky-body-y: 17%; }
+html[data-sky="day"]  { --sky-zenith: #9ccbff; --sky-horizon: #eaf4ff; --sky-body: #fff4c2; --sky-body-x: 78%; --sky-body-y: 9%; }
+html[data-sky="dusk"] { --sky-zenith: #ffd9ae; --sky-horizon: #f7c3d3; --sky-body: #ff8a4c; --sky-body-x: 82%; --sky-body-y: 18%; }
+html[data-sky="night"]{ --sky-zenith: #c9ccf2; --sky-horizon: #edeefb; --sky-body: #ffffff; --sky-body-x: 84%; --sky-body-y: 8%; }
+
+@media (prefers-color-scheme: dark) {
+  html[data-sky="dawn"] { --sky-zenith: #0b1030; --sky-horizon: #3b2340; --sky-body: #ff9f5a; }
+  html[data-sky="day"]  { --sky-zenith: #0a1a3f; --sky-horizon: #12305c; --sky-body: #ffe9a8; }
+  html[data-sky="dusk"] { --sky-zenith: #160f33; --sky-horizon: #4a1f3a; --sky-body: #ff7a3d; }
+  html[data-sky="night"]{ --sky-zenith: #070b1f; --sky-horizon: #0d1433; --sky-body: #cfe3ff; }
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--live);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- The sky behind everything: a faint map dot-grid over the sky gradient, fixed so the
+   content scrolls over it ---------- */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--ink) 9%, transparent) 1px, transparent 0)
+      0 0 / 24px 24px,
+    linear-gradient(180deg, var(--sky-zenith) 0%, var(--sky-horizon) 45%, var(--background) 85%);
+}
+
+/* The sun or moon: a soft disc with a halo, placed by the phase. */
+.sky__body {
+  position: absolute;
+  left: var(--sky-body-x);
+  top: var(--sky-body-y);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: var(--sky-body);
+  box-shadow: 0 0 60px 26px color-mix(in srgb, var(--sky-body) 45%, transparent);
+}
+
+html[data-sky="night"] .sky__body {
+  /* A crescent: the disc with a bite cut out by a mask. */
+  -webkit-mask: radial-gradient(circle at 72% 30%, transparent 44%, #000 45%);
+  mask: radial-gradient(circle at 72% 30%, transparent 44%, #000 45%);
+  box-shadow: none;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--sky-body) 60%, transparent));
+}
+
+/* ---------- Layout ---------- */
+.masthead,
+main,
+.footer {
+  width: min(1120px, 100% - 2 * var(--space-3));
+  margin-inline: auto;
+}
+
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  text-decoration: none;
+}
+
+.brand__tile {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--brand) calc(var(--glow) * 100%), transparent);
+}
+
+.brand__tile svg {
+  width: 24px;
+  height: 24px;
+}
+
+.brand__name {
+  font-size: 24px;
+  font-weight: 650;
+  font-stretch: 112%;
+}
+
+.masthead__greeting {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--brand-ink);
+  font-weight: 550;
+}
+
+.masthead__greeting svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- Intro + roadmap ribbon ---------- */
+.intro {
+  padding-block: var(--space-4) var(--space-6);
+}
+
+.intro__title {
+  margin: 0;
+  max-width: 14ch;
+  font-size: clamp(40px, 7vw, 76px);
+  line-height: 1.02;
+  font-weight: 750;
+  font-stretch: 125%;
+  letter-spacing: -0.02em;
+}
+
+.intro__lede {
+  margin: var(--space-3) 0 0;
+  max-width: 52ch;
+  font-size: 19px;
+  color: var(--ink-muted);
+}
+
+.roadmap {
+  margin: var(--space-6) 0 0;
+}
+
+.roadmap svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.roadmap__track {
+  fill: none;
+  stroke: var(--ink-faint);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.roadmap__lit {
+  fill: none;
+  stroke: url(#roadmap-gradient);
+  stroke-width: 6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--live) calc(var(--glow) * 100%), transparent));
+}
+
+.roadmap__node {
+  fill: var(--panel-raised);
+  stroke: var(--ink-faint);
+  stroke-width: 2;
+}
+
+.roadmap__node--done {
+  fill: var(--brand);
+  stroke: var(--brand);
+}
+
+.roadmap__node--goal {
+  stroke: var(--success);
+}
+
+.roadmap__label {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.roadmap__detail {
+  font-family: var(--font);
+  font-size: 12.5px;
+  fill: var(--ink-muted);
+}
+
+.roadmap__van-disc {
+  fill: var(--brand);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--brand) calc(var(--glow) * 100%), transparent));
+}
+
+.roadmap__van-ring {
+  fill: none;
+  stroke: var(--live);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse 1.8s ease-out infinite;
+}
+
+/* Small screens: the roadmap becomes a vertical list, which reads better than a squeezed road. */
+.roadmap__list {
+  display: none;
+}
+
+@keyframes pulse {
+  from { scale: 1; opacity: 1; }
+  to { scale: 1.9; opacity: 0; }
+}
+
+/* ---------- A week ---------- */
+.week {
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--hairline);
+}
+
+.week__date {
+  margin: 0;
+  color: var(--brand-ink);
+  font-weight: 600;
+}
+
+.week__title {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(30px, 4.4vw, 46px);
+  line-height: 1.08;
+  font-weight: 700;
+  font-stretch: 118%;
+}
+
+.week__summary {
+  margin: var(--space-2) 0 0;
+  max-width: var(--measure);
+  font-size: 19px;
+  color: var(--ink-muted);
+}
+
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.highlight {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.highlight__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--brand) 18%, transparent);
+  color: var(--brand-ink);
+}
+
+.highlight__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.highlight__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.highlight__text {
+  margin: 2px 0 0;
+  color: var(--ink-muted);
+  font-size: 16px;
+}
+
+/* ---------- Gallery: phone screenshots ---------- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shot {
+  margin: 0;
+}
+
+.shot button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--panel);
+  cursor: zoom-in;
+  transition: translate 0.25s ease, box-shadow 0.25s ease;
+}
+
+.shot button:hover {
+  translate: 0 -4px;
+  box-shadow: 0 12px 30px -12px color-mix(in srgb, var(--live) 50%, transparent);
+}
+
+.shot figcaption {
+  margin-top: var(--space-1);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+
+.feature {
+  margin: var(--space-4) 0 0;
+}
+
+.feature button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  background: var(--panel);
+  cursor: zoom-in;
+}
+
+.feature figcaption {
+  margin-top: var(--space-1);
+  color: var(--ink-muted);
+  font-size: 15px;
+}
+
+/* ---------- Next ---------- */
+.next {
+  margin: var(--space-6) 0 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in srgb, var(--live) 40%, transparent);
+  background: color-mix(in srgb, var(--live) 9%, var(--panel));
+}
+
+.next__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.next__list {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.next__list li {
+  display: flex;
+  gap: var(--space-1);
+  align-items: baseline;
+}
+
+.next__list svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  translate: 0 2px;
+  color: var(--live);
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  max-width: min(92vw, 1200px);
+  max-height: 94vh;
+  padding: var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.lightbox::backdrop {
+  background: color-mix(in srgb, #000 70%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.lightbox__image {
+  max-height: 80vh;
+  width: auto;
+  margin-inline: auto;
+  border-radius: 16px;
+}
+
+.lightbox__caption {
+  margin: var(--space-1) 0 0;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--panel-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.lightbox__close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  padding-block: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--hairline);
+  color: var(--ink-muted);
+  font-size: 15px;
+}
+
+.noscript {
+  color: var(--ink-muted);
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 960px) {
+  .gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 16px;
+  }
+
+  .masthead,
+  main,
+  .footer {
+    width: calc(100% - 2 * var(--space-2));
+  }
+
+  .roadmap svg {
+    display: none;
+  }
+
+  .roadmap__list {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .roadmap__list li {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: var(--space-1);
+    align-items: baseline;
+    color: var(--ink-muted);
+  }
+
+  .roadmap__list li::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--ink-faint);
+    translate: 0 1px;
+  }
+
+  .roadmap__list li[data-state="done"]::before,
+  .roadmap__list li[data-state="current"]::before {
+    background: var(--brand);
+    border-color: var(--brand);
+  }
+
+  .roadmap__list li[data-state="current"] {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Phones: swipe through screenshots sideways instead of a tall grid. */
+  .gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: var(--space-2);
+    padding-bottom: var(--space-1);
+  }
+
+  /* The list items are the flex children, so they carry the width (not the figure inside). */
+  .gallery > li {
+    flex: 0 0 62%;
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------- Reduced motion: no pulse, no lift ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .roadmap__van-ring {
+    animation: none;
+    opacity: 0;
+  }
+
+  .shot button {
+    transition: none;
+  }
+}
