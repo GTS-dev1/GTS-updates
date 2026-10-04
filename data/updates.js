@@ -92,7 +92,7 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-10-04/trip-arrived-dark.jpg', caption: 'Arrived: the van docks into home' },
         { src: 'assets/updates/2026-10-04/start-dawn-light.jpg', caption: 'Start screen under the dawn sky (light mode)' },
         { src: 'assets/updates/2026-10-04/start-night-dark.jpg', caption: 'Start screen under the night sky (dark mode)' },
-        { src: 'assets/updates/2026-10-04/trip-nearby-light.jpg', caption: 'The live trip in light mode' },
+        { src: 'assets/updates/2026-10-04/trip-nearby-hindi.jpg', caption: 'The same moment in Hindi: 1.0 km, about 2 minutes away' },
       ],
       feature: {
         src: 'assets/updates/2026-10-04/living-sky-overview.jpg',
