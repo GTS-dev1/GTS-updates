@@ -1,0 +1,124 @@
+/*
+  Screenshot viewer (js/lightbox.js): a full-screen dark <dialog> with the image as large as fits,
+  arrows at the sides (below the image on phones), a counter and the caption. Always dark, in both
+  themes, so screenshots read the same way they do on a phone.
+*/
+
+.lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(4 6 18 / 0.97);
+  color: #f2f4ff;
+  overflow: hidden;
+}
+
+.lightbox::backdrop {
+  background: rgb(4 6 18 / 0.7);
+}
+
+.lightbox__stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-7) var(--space-5) var(--space-5);
+}
+
+.lightbox__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 0;
+  height: 100%;
+  margin: 0;
+  justify-content: center;
+}
+
+.lightbox__image {
+  max-width: 100%;
+  max-height: calc(100dvh - 160px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 22px;
+  box-shadow: 0 0 0 6px #0b0f24, 0 0 0 7px #2b3352, 0 30px 80px -20px #000;
+  /* Let the browser pinch-zoom; one-finger swipes come to js/lightbox.js as pointer events. */
+  touch-action: pinch-zoom;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lightbox__image.is-wide {
+  border-radius: 10px;
+  box-shadow: 0 30px 80px -20px #000;
+}
+
+.lightbox__figure figcaption {
+  max-width: 60ch;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #c9cfee;
+}
+
+.lightbox__counter {
+  margin-right: var(--space-2);
+  font-weight: 600;
+  color: #ffc233;
+  font-variant-numeric: tabular-nums;
+}
+
+.lightbox .icon-button {
+  width: 48px;
+  height: 48px;
+  border-color: rgb(255 255 255 / 0.16);
+  background: rgb(255 255 255 / 0.06);
+  color: #f2f4ff;
+}
+
+.lightbox .icon-button:hover {
+  background: rgb(255 255 255 / 0.14);
+}
+
+.lightbox :focus-visible {
+  outline-color: #40d9ff;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
+/* Phones: arrows sit in a row under the image, where a thumb reaches them. */
+@media (max-width: 640px) {
+  .lightbox__stage {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding: 64px var(--space-4) var(--space-4);
+    gap: var(--space-3);
+  }
+  .lightbox__figure {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .lightbox__nav--prev {
+    grid-row: 2;
+    justify-self: end;
+  }
+  .lightbox__nav--next {
+    grid-row: 2;
+    justify-self: start;
+  }
+  .lightbox__image {
+    max-height: calc(100dvh - 210px);
+    border-radius: 18px;
+  }
+}

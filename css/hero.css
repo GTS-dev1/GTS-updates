@@ -1,0 +1,300 @@
+/*
+  Hero: what GTS is, the latest week (card with a phone peeking from its edge) and the progress at a
+  glance. The faint radar behind the headline is the page's only decoration (the app's live-trip
+  radar: home in the middle, the 1 km ring, the van approaching); it sweeps slowly unless the
+  reader prefers reduced motion.
+*/
+
+.hero {
+  position: relative;
+  padding: var(--space-7) 0 var(--space-8);
+  /* Keeps the radar inside the hero, so it never makes the page wider than the screen. */
+  overflow: hidden;
+}
+
+.hero__inner {
+  position: relative;
+}
+
+.hero__radar {
+  position: absolute;
+  top: 24px;
+  right: -40px;
+  width: min(520px, 70vw);
+  height: auto;
+  fill: none;
+  stroke: var(--live);
+  stroke-width: 1.2;
+  opacity: 0.28;
+  pointer-events: none;
+  /* Fades the rings out towards the edges, so no hard cut where the page ends. */
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 30%, transparent 70%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 30%, transparent 70%);
+}
+
+.hero__radar-near {
+  stroke: var(--brand);
+  stroke-width: 2;
+  stroke-dasharray: 4 6;
+}
+
+.hero__radar-sweep {
+  fill: var(--live);
+  stroke: none;
+  opacity: 0.18;
+  transform-origin: 200px 200px;
+  animation: radar-sweep 9s linear infinite;
+}
+
+.hero__radar-home {
+  fill: var(--ink);
+  stroke: none;
+}
+
+.hero__radar-van {
+  fill: var(--brand);
+  stroke: none;
+}
+
+@keyframes radar-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero__title {
+  margin-top: var(--space-4);
+  max-width: 14ch;
+  font-size: clamp(42px, 7.4vw, 82px);
+  font-weight: 750;
+  font-stretch: var(--wide);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.hero__title span {
+  color: var(--live);
+}
+
+.hero__lede {
+  margin-top: var(--space-5);
+  max-width: 58ch;
+  font-size: clamp(18px, 2vw, 20px);
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.hero__cards {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+}
+
+@media (min-width: 880px) {
+  .hero__cards {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+}
+
+/* ---------- Latest update card ---------- */
+.hero__latest {
+  display: grid;
+}
+
+.latest {
+  position: relative;
+  display: flex;
+  gap: var(--space-5);
+  overflow: hidden;
+  padding: var(--space-6) var(--space-6) 0;
+  min-height: 100%;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 90% at 100% 100%, var(--live-soft), transparent 60%),
+    var(--panel);
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.latest:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-lift);
+}
+
+.latest__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-6);
+  min-width: 0;
+}
+
+.latest__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.latest__title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  font-stretch: var(--wide);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.latest__summary {
+  color: var(--ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.latest__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-2);
+  font-weight: 600;
+  color: var(--live);
+}
+
+.latest:hover .latest__cta .icon {
+  transform: translateX(3px);
+}
+
+.latest__cta .icon {
+  transition: transform 0.2s ease;
+}
+
+/* The phone peeks up from the card's bottom edge. */
+.latest__phone {
+  align-self: flex-end;
+  margin-bottom: -64px;
+}
+
+@media (max-width: 520px) {
+  .latest {
+    padding: var(--space-5) var(--space-5) 0;
+  }
+  .latest__text {
+    padding-bottom: var(--space-5);
+  }
+  /* .latest qualifies it so it outranks .device { display: block } in updates.css. */
+  .latest .latest__phone {
+    display: none;
+  }
+}
+
+/* ---------- At a glance ---------- */
+.glance {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (max-width: 520px) {
+  .glance {
+    padding: var(--space-5);
+  }
+}
+
+.glance__eyebrow {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.glance__count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--ink-muted);
+}
+
+.glance__count strong {
+  font-size: 56px;
+  line-height: 0.9;
+  font-weight: 750;
+  font-stretch: var(--wide);
+  color: var(--ink);
+}
+
+.glance__bar {
+  display: flex;
+  gap: 4px;
+}
+
+.glance__segment {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line);
+}
+
+.glance__segment[data-status="done"] {
+  background: var(--success);
+}
+
+.glance__segment[data-status="now"] {
+  background: linear-gradient(90deg, var(--brand) 60%, var(--line) 60%);
+}
+
+.glance__segment[data-status="next"] {
+  background: var(--line-strong);
+}
+
+.glance__rows {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-1) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.glance__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.glance__row dt {
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.glance__row dd {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.glance__row[data-status="now"] dd .icon {
+  color: var(--brand-ink);
+}
+
+.glance__row[data-status="next"] dd .icon {
+  color: var(--live);
+}
+
+.glance__row[data-status="later"] dd .icon {
+  color: var(--ink-soft);
+}

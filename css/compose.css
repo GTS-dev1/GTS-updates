@@ -1,0 +1,379 @@
+/*
+  compose.html only: the form (left), and the entry to paste with its checks above the live preview
+  (right, sticky on wide screens). The preview itself uses the page's own styles (updates.css), so
+  it looks exactly like index.html.
+*/
+
+.compose {
+  --page-max: 1440px;
+  max-width: var(--page-max);
+  padding-bottom: var(--space-8);
+}
+
+.compose-page .topbar__inner {
+  max-width: 1440px;
+}
+
+.compose__intro {
+  padding: var(--space-6) 0 var(--space-5);
+}
+
+.compose__layout {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 1100px) {
+  .compose__layout {
+    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+    align-items: start;
+  }
+  .compose__side {
+    position: sticky;
+    top: calc(var(--topbar-height) + var(--space-4));
+    max-height: calc(100vh - var(--topbar-height) - 2 * var(--space-4));
+    overflow: auto;
+    padding-right: var(--space-1);
+  }
+}
+
+.compose__form,
+.compose__side {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-l);
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.panel__title {
+  font-size: 18px;
+  font-weight: 700;
+  font-stretch: var(--wide);
+}
+
+.panel__hint {
+  font-size: 15px;
+  color: var(--ink-muted);
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--bg-sunken);
+}
+
+/* ---------- Fields ---------- */
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field__label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.field__label small,
+legend small {
+  font-weight: 400;
+  color: var(--ink-soft);
+  margin-left: 6px;
+}
+
+.field-pair {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 520px) {
+  .field-pair {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+}
+
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line-strong);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--live);
+  outline-offset: 1px;
+}
+
+/* ---------- Repeated rows (highlights, screenshots) ---------- */
+.row {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-m);
+  border: 1px solid var(--line);
+  background: var(--panel-raised);
+}
+
+.row legend {
+  padding: 0 6px;
+  font-weight: 650;
+  font-size: 15px;
+}
+
+.row-tools {
+  position: absolute;
+  top: -14px;
+  right: var(--space-3);
+  display: flex;
+  gap: 4px;
+}
+
+.icon-button--small {
+  width: 30px;
+  height: 30px;
+}
+
+.icon-button--small .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+  gap: 4px;
+}
+
+.icon-choice {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.icon-choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.icon-choice:hover {
+  background: var(--bg-sunken);
+}
+
+.icon-choice:has(input:checked) {
+  border-color: var(--live);
+  background: var(--live-soft);
+  color: var(--live-ink);
+}
+
+.icon-choice:has(input:focus-visible) {
+  outline: 3px solid var(--live);
+  outline-offset: 1px;
+}
+
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-choice {
+  position: relative;
+}
+
+.tag-choice input {
+  position: absolute;
+  opacity: 0;
+}
+
+.tag-choice span {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tag-choice input:checked + span {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.tag-choice input:focus-visible + span {
+  outline: 3px solid var(--live);
+  outline-offset: 2px;
+}
+
+.shot-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.shot-row__thumb {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 720 / 1560;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--device);
+  color: var(--ink-soft);
+}
+
+.shot-row__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shot-row__fields {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* ---------- Buttons ---------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  justify-self: start;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover {
+  border-color: var(--ink-soft);
+}
+
+.button--quiet {
+  border-color: var(--line);
+  background: transparent;
+  font-weight: 500;
+}
+
+.button--primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.button--primary:hover {
+  border-color: var(--brand-ink);
+}
+
+.button--file:focus-within {
+  outline: 3px solid var(--live);
+  outline-offset: 2px;
+}
+
+/* ---------- Output and checks ---------- */
+.output__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.output {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: auto;
+}
+
+.checks {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  font-size: 15px;
+}
+
+.checks[data-state="clean"] {
+  background: var(--success-soft);
+  color: var(--success-ink);
+}
+
+.checks[data-state="problems"] {
+  border: 1px solid var(--alert);
+  color: var(--ink);
+}
+
+.checks__title {
+  font-weight: 650;
+}
+
+.checks[data-state="problems"] .checks__title {
+  color: var(--alert);
+}
+
+.checks ul {
+  margin-top: var(--space-2);
+  padding-left: 18px;
+  list-style: disc;
+  color: var(--ink-muted);
+}
+
+/* ---------- Preview ---------- */
+.preview-panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-l);
+  border: 1px dashed var(--line-strong);
+  background: var(--bg);
+}
+
+.preview {
+  display: grid;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+/* The copy-link button needs the published page; hide it in the preview. */
+.preview .week__copy {
+  display: none;
+}

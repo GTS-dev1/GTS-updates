@@ -1,0 +1,107 @@
+<!doctype html>
+<!--
+  GTS updates — compose a week. A LOCAL TOOL: open this file straight from disk; it is not linked
+  from the public page. Fill the form, check the live preview (drawn by the same renderer as
+  index.html), press "Copy entry", and paste the result at the top of `weeks` in data/updates.js.
+  Then run `node tools/check-updates.js`. Steps in README.md, "Post a week".
+  Works offline: everything is local except the web font, which falls back to the system font.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Compose an update · GTS</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wdth,wght@75..125,300..800&family=Anek+Latin:wdth,wght@75..125,300..800&display=swap"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/hero.css" />
+    <link rel="stylesheet" href="css/updates.css" />
+    <link rel="stylesheet" href="css/lightbox.css" />
+    <link rel="stylesheet" href="css/compose.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body class="compose-page">
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="index.html" aria-label="Open the updates page">
+          <img class="brand__tile" src="assets/favicon.svg" alt="" width="32" height="32" />
+          <span class="brand__name">GTS</span>
+          <span class="brand__sub">Compose</span>
+        </a>
+        <button type="button" class="button button--quiet" id="reset-form">New week</button>
+        <button type="button" class="icon-button" data-theme-toggle aria-label="Switch theme">
+          <svg class="icon icon--theme-dark" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-moon"></use></svg>
+          <svg class="icon icon--theme-light" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-sun"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="compose">
+      <div class="compose__intro">
+        <h1 class="section-title">Compose a weekly update</h1>
+        <p class="section-sub">
+          Fill the form; the preview on the right is exactly how the week will look. The draft is kept in
+          this browser. Public page: product progress only, no money, legal matters, dates or anyone's
+          contact details.
+        </p>
+      </div>
+
+      <div class="compose__layout">
+        <form class="compose__form" id="compose-form" novalidate></form>
+
+        <div class="compose__side">
+          <section class="panel panel--output" aria-labelledby="output-title">
+            <div class="output__head">
+              <h2 class="panel__title" id="output-title">Entry to paste</h2>
+              <button type="button" class="button button--primary" id="copy-entry">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-copy"></use></svg><span>Copy entry</span>
+              </button>
+            </div>
+            <div class="checks" id="checks" role="status" aria-live="polite"></div>
+            <label class="visually-hidden" for="output">Entry source</label>
+            <textarea class="output" id="output" rows="10" readonly spellcheck="false"></textarea>
+            <p class="panel__hint">Paste it right after <code>weeks: [</code> in <code>data/updates.js</code>, then run
+              <code>node tools/check-updates.js</code>.</p>
+          </section>
+
+          <section class="preview-panel" aria-labelledby="preview-title">
+            <h2 class="panel__title" id="preview-title">Preview</h2>
+            <div class="preview" id="preview"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <dialog class="lightbox" id="lightbox" aria-label="Screenshot viewer">
+      <div class="lightbox__stage">
+        <button type="button" class="lightbox__nav lightbox__nav--prev icon-button" data-lightbox-prev aria-label="Previous screenshot">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-chevron-left"></use></svg>
+        </button>
+        <figure class="lightbox__figure">
+          <img class="lightbox__image" alt="" />
+          <figcaption><span class="lightbox__counter"></span> <span class="lightbox__caption"></span></figcaption>
+        </figure>
+        <button type="button" class="lightbox__nav lightbox__nav--next icon-button" data-lightbox-next aria-label="Next screenshot">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-chevron-right"></use></svg>
+        </button>
+      </div>
+      <button type="button" class="lightbox__close icon-button" aria-label="Close viewer">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-close"></use></svg>
+      </button>
+    </dialog>
+
+    <script src="data/updates.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/validate.js"></script>
+    <script src="js/entry-source.js"></script>
+    <script src="js/lightbox.js"></script>
+    <script src="js/compose.js"></script>
+  </body>
+</html>

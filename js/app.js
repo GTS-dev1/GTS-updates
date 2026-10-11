@@ -1,287 +1,353 @@
 /**
- * GTS updates — renders window.GTS_UPDATES (data/updates.js) into the page.
+ * index.html: puts the content of data/updates.js on the page and makes it easy to move around.
  *
- * WHAT it does, in order: sets the living sky and greeting for the visitor's time of day, draws the
- * roadmap ribbon, renders every week (newest first), and wires the screenshot lightbox.
- * WHY plain JavaScript: GitHub Pages serves the files as they are — no build step to keep working.
+ * WHAT it does, in order:
+ *   1. hero: the latest week's card and the at-a-glance progress (js/render.js);
+ *   2. the journey road;
+ *   3. the updates feed, newest first: the first OPEN_WEEKS weeks open, later ones collapsed to
+ *      their header, and anything past VISIBLE_WEEKS behind a "Show older updates" button;
+ *   4. the week index (sticky sidebar on wide screens, a "Jump to week" menu on phones), which
+ *      marks the week being read;
+ *   5. permalinks: index.html#2026-10-04 opens that week (expanding it if needed), scrolls to it
+ *      and flashes it; "Copy link" copies that address;
+ *   6. area filter chips, which narrow every week's highlights to one area;
+ *   7. the screenshot viewer (js/lightbox.js).
+ * WHY plain JavaScript: GitHub Pages serves the files as they are, and the page must also open
+ * from disk (file://), so there is no build step and no framework.
  */
 (function renderUpdatesPage() {
   'use strict';
 
-  /** Sky phases by local hour — the same boundaries as the GTS app's living sky. */
-  const SKY_PHASES = [
-    { name: 'dawn', fromHour: 5, greeting: 'Good morning', icon: 'icon-sun' },
-    { name: 'day', fromHour: 8, greeting: 'Good day', icon: 'icon-sun' },
-    { name: 'dusk', fromHour: 16, greeting: 'Good evening', icon: 'icon-sun' },
-    { name: 'night', fromHour: 19, greeting: 'Good night', icon: 'icon-moon' },
-  ];
-
-  /** Roadmap drawing size (SVG user units); the SVG scales to the page width. */
-  const ROADMAP_WIDTH = 1000;
-  const ROADMAP_HEIGHT = 190;
-  const ROAD_Y = 70;
-  const ROAD_BEND = 34;
-  const NODE_RADIUS = 11;
-  const VAN_RADIUS = 18;
-  const LABEL_GAP = 44;
-  const DETAIL_GAP = 19;
-  const SIDE_INSET = 40;
+  /** Weeks shown fully open at the top; older ones start collapsed to their header and summary. */
+  const OPEN_WEEKS = 2;
+  /** Weeks on the page before "Show older updates"; keeps a long history short to scroll. */
+  const VISIBLE_WEEKS = 6;
+  /** How long a week opened by its permalink stays highlighted (ms); matches the CSS animation. */
+  const TARGET_FLASH_MS = 2400;
+  /** How long "Copied" shows on a copy-link button before it reads "Copy link" again (ms). */
+  const COPIED_MS = 2000;
+  /** The band of the screen (from the top) that decides which week the index marks as current. */
+  const READING_BAND = '-25% 0px -65% 0px';
 
   const data = window.GTS_UPDATES;
-  if (!data) {
+  const { render, icons, lightbox } = window.GTS;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  icons.mount(document);
+  if (!data || !Array.isArray(data.weeks) || data.weeks.length === 0) {
+    document.getElementById('feed').innerHTML = '<p class="empty">No updates yet.</p>';
     return;
   }
 
-  applyLivingSky(new Date());
-  renderRoadmap(document.getElementById('roadmap'), data.roadmap);
-  renderWeeks(document.getElementById('weeks'), data.weeks);
-  wireLightbox(document.getElementById('lightbox'));
+  const lookups = render.indexData(data);
+  const feed = document.getElementById('feed');
+
+  document.getElementById('latest').innerHTML = render.renderLatest(data.weeks[0]);
+  document.getElementById('glance').innerHTML = render.renderGlance(data.roadmap);
+  document.getElementById('road').innerHTML = render.renderRoadmap(data.roadmap);
+  renderFeed();
+  renderWeekIndex();
+  renderFilters();
+  lightbox.wire(document.getElementById('lightbox'));
+  wireWeekLinks();
+  wireReadingTracker();
+  if (window.location.hash) {
+    // Opened from a permalink: jump straight there (no animation on arrival), then line it up
+    // again once the web font has loaded, because the font changes line heights above the week.
+    const linkedId = decodeURIComponent(window.location.hash.slice(1));
+    if (revealWeek(linkedId, { instant: true }) && document.fonts) {
+      document.fonts.ready.then(() => {
+        document.getElementById(linkedId).scrollIntoView({ block: 'start' });
+      });
+    }
+  }
 
   /**
-   * Picks the sky phase for a local time and applies it: `data-sky` on <html> and the greeting.
+   * Draws every week into the feed, numbered from the oldest (Update 1), plus the "Show older"
+   * button when the history is longer than VISIBLE_WEEKS.
    *
-   * @param {Date} now The visitor's current time.
-   * @example applyLivingSky(new Date(2026, 9, 5, 7, 30));  // data-sky="dawn", "Good morning"
-   * @example applyLivingSky(new Date(2026, 9, 5, 21, 0));  // data-sky="night", "Good night"
-   * @example applyLivingSky(new Date(2026, 9, 5, 2, 0));   // night — wraps past midnight
+   * @example // 1 week  -> one open article, no button
+   * @example // 9 weeks -> weeks 1–2 open, 3–6 collapsed, 7–9 hidden; button 'Show 3 older updates'
    */
-  function applyLivingSky(now) {
-    const hour = now.getHours();
-    // The last phase whose start has passed today; before 05:00 it is still last night.
-    let phase = SKY_PHASES[SKY_PHASES.length - 1];
-    for (const candidate of SKY_PHASES) {
-      if (hour >= candidate.fromHour) {
-        phase = candidate;
+  function renderFeed() {
+    const total = data.weeks.length;
+    let html = '';
+    data.weeks.forEach((week, index) => {
+      html += render.renderWeek(week, {
+        ...lookups,
+        number: total - index,
+        collapsed: index >= OPEN_WEEKS,
+      });
+    });
+    const olderCount = Math.max(0, total - VISIBLE_WEEKS);
+    if (olderCount > 0) {
+      html += `<button type="button" class="show-older" data-show-older>${icons.svg('chevron-down')}
+                 <span>Show ${olderCount} older update${olderCount === 1 ? '' : 's'}</span></button>`;
+    }
+    feed.innerHTML = html;
+    feed.querySelectorAll('[data-week]').forEach((article, index) => {
+      article.tabIndex = -1;
+      if (index >= VISIBLE_WEEKS) {
+        article.hidden = true;
+        article.dataset.older = '';
       }
-    }
-    document.documentElement.dataset.sky = phase.name;
-    const greeting = document.getElementById('greeting');
-    greeting.innerHTML = '';
-    greeting.append(icon(phase.icon), document.createTextNode(phase.greeting));
-  }
-
-  /**
-   * Draws the roadmap as the GTS journey ribbon: a road from the first phase to the pilot, lit up
-   * to where the work is, with the van there. On small screens CSS swaps it for a simple list.
-   *
-   * @param {HTMLElement} host The <figure> to draw into.
-   * @param {{phases: {label: string, detail: string}[], currentPhase: number, phaseProgress: number}} roadmap
-   * @example renderRoadmap(figure, { phases: [...7], currentPhase: 0, phaseProgress: 0.9 });
-   *          // van 90 % of the way from "Foundation" to "Sign-in"; Foundation's node lit
-   */
-  function renderRoadmap(host, roadmap) {
-    const count = roadmap.phases.length;
-    const step = (ROADMAP_WIDTH - 2 * SIDE_INSET) / (count - 1);
-    const nodeX = (index) => SIDE_INSET + index * step;
-    // A gentle wave through every node: up and down alternately, like the app's ribbon.
-    const nodeY = (index) => ROAD_Y + (index % 2 === 0 ? -1 : 1) * ROAD_BEND * 0.35;
-    const vanIndex = Math.min(roadmap.currentPhase + roadmap.phaseProgress, count - 1);
-
-    let road = `M ${nodeX(0)} ${nodeY(0)}`;
-    for (let index = 1; index < count; index++) {
-      const midX = (nodeX(index - 1) + nodeX(index)) / 2;
-      road += ` C ${midX} ${nodeY(index - 1)}, ${midX} ${nodeY(index)}, ${nodeX(index)} ${nodeY(index)}`;
-    }
-
-    const svgNs = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(svgNs, 'svg');
-    svg.setAttribute('viewBox', `0 0 ${ROADMAP_WIDTH} ${ROADMAP_HEIGHT}`);
-    svg.setAttribute('role', 'img');
-    svg.setAttribute(
-      'aria-label',
-      `Roadmap: now working on ${roadmap.phases[roadmap.currentPhase].label}, ` +
-        `${count} phases to the pilot.`,
-    );
-    svg.innerHTML = `
-      <defs>
-        <linearGradient id="roadmap-gradient" x1="0" x2="1">
-          <stop offset="0" stop-color="var(--brand)" />
-          <stop offset="1" stop-color="var(--live)" />
-        </linearGradient>
-      </defs>
-      <path class="roadmap__track" d="${road}" />
-      <path class="roadmap__lit" d="${road}" pathLength="1"
-            stroke-dasharray="1" stroke-dashoffset="${1 - vanIndex / (count - 1)}" />`;
-
-    roadmap.phases.forEach((phase, index) => {
-      const isDone = index <= roadmap.currentPhase;
-      const isGoal = index === count - 1;
-      const x = nodeX(index);
-      const y = nodeY(index);
-      const nodeClass = `roadmap__node${isDone ? ' roadmap__node--done' : ''}${isGoal ? ' roadmap__node--goal' : ''}`;
-      svg.insertAdjacentHTML(
-        'beforeend',
-        `<circle class="${nodeClass}" cx="${x}" cy="${y}" r="${NODE_RADIUS}" />
-         <text class="roadmap__label" x="${x}" y="${y + LABEL_GAP}" text-anchor="middle">${escapeHtml(phase.label)}</text>
-         <text class="roadmap__detail" x="${x}" y="${y + LABEL_GAP + DETAIL_GAP}" text-anchor="middle">${escapeHtml(shorten(phase.detail))}</text>`,
-      );
     });
 
-    // The van: interpolated between the two nodes around its position along the road.
-    const from = Math.floor(vanIndex);
-    const share = vanIndex - from;
-    const to = Math.min(from + 1, count - 1);
-    const vanX = nodeX(from) + (nodeX(to) - nodeX(from)) * share;
-    const vanY = nodeY(from) + (nodeY(to) - nodeY(from)) * share;
-    svg.insertAdjacentHTML(
-      'beforeend',
-      `<circle class="roadmap__van-ring" cx="${vanX}" cy="${vanY}" r="${VAN_RADIUS}" />
-       <circle class="roadmap__van-disc" cx="${vanX}" cy="${vanY}" r="${VAN_RADIUS}" />
-       <use href="#icon-van" x="${vanX - 12}" y="${vanY - 12}" width="24" height="24" style="color: var(--on-brand)" />`,
-    );
-    host.append(svg);
-
-    // The small-screen version: the same phases as a list.
-    const list = document.createElement('ol');
-    list.className = 'roadmap__list';
-    roadmap.phases.forEach((phase, index) => {
-      const item = document.createElement('li');
-      item.dataset.state =
-        index < roadmap.currentPhase ? 'done' : index === roadmap.currentPhase ? 'current' : 'upcoming';
-      item.textContent = `${phase.label} — ${phase.detail}`;
-      list.append(item);
-    });
-    host.append(list);
-  }
-
-  /**
-   * Renders every week as a <section>: date, title, summary, highlights, gallery, feature image
-   * and what comes next.
-   *
-   * @param {HTMLElement} host Where the weeks go.
-   * @param {object[]} weeks Newest first, as in data/updates.js.
-   * @example renderWeeks(container, window.GTS_UPDATES.weeks);  // one <section class="week"> each
-   */
-  function renderWeeks(host, weeks) {
-    for (const week of weeks) {
-      const section = document.createElement('section');
-      section.className = 'week';
-      section.id = week.id;
-      section.innerHTML = `
-        <p class="week__date">${escapeHtml(week.dateLabel)}</p>
-        <h2 class="week__title">${escapeHtml(week.title)}</h2>
-        <p class="week__summary">${escapeHtml(week.summary)}</p>
-        <ul class="highlights">
-          ${week.highlights
-            .map(
-              (item) => `
-            <li class="highlight">
-              <span class="highlight__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-${item.icon}" /></svg></span>
-              <div>
-                <h3 class="highlight__title">${escapeHtml(item.title)}</h3>
-                <p class="highlight__text">${escapeHtml(item.text)}</p>
-              </div>
-            </li>`,
-            )
-            .join('')}
-        </ul>
-        <ul class="gallery">
-          ${week.gallery.map((shot) => `<li>${figure(shot, 'shot')}</li>`).join('')}
-        </ul>
-        ${week.feature ? figure(week.feature, 'feature') : ''}
-        <aside class="next">
-          <h3 class="next__title">Next</h3>
-          <ul class="next__list">
-            ${week.next
-              .map((item) => `<li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-arrow" /></svg>${escapeHtml(item)}</li>`)
-              .join('')}
-          </ul>
-        </aside>`;
-      host.append(section);
-    }
-  }
-
-  /**
-   * One screenshot as a <figure> whose image opens in the lightbox.
-   *
-   * @param {{src: string, caption: string}} shot
-   * @param {'shot'|'feature'} kind Phone screenshot or the wide feature image.
-   * @returns {string} The figure's HTML.
-   * @example figure({ src: 'a.jpg', caption: 'Arrived' }, 'shot');
-   *          // <figure class="shot"><button …><img alt="Arrived" …></button><figcaption>Arrived</figcaption></figure>
-   */
-  function figure(shot, kind) {
-    const caption = escapeHtml(shot.caption);
-    return `
-      <figure class="${kind}">
-        <button type="button" data-full="${escapeHtml(shot.src)}" data-caption="${caption}" aria-label="Enlarge: ${caption}">
-          <img src="${escapeHtml(shot.src)}" alt="${caption}" loading="lazy" decoding="async" />
-        </button>
-        <figcaption>${caption}</figcaption>
-      </figure>`;
-  }
-
-  /**
-   * Opens any clicked screenshot full size in the <dialog>; Escape, the close button or a click on
-   * the backdrop closes it.
-   *
-   * @param {HTMLDialogElement} dialog
-   * @example // click a screenshot -> dialog opens with the image and its caption
-   */
-  function wireLightbox(dialog) {
-    const image = dialog.querySelector('.lightbox__image');
-    const caption = dialog.querySelector('.lightbox__caption');
-    document.addEventListener('click', (event) => {
-      const trigger = event.target.closest('[data-full]');
-      if (!trigger) {
+    feed.addEventListener('click', (event) => {
+      const expand = event.target.closest('.week__expand');
+      if (expand) {
+        expandWeek(expand.closest('[data-week]'));
         return;
       }
-      image.src = trigger.dataset.full;
-      image.alt = trigger.dataset.caption;
-      caption.textContent = trigger.dataset.caption;
-      dialog.showModal();
-    });
-    dialog.querySelector('.lightbox__close').addEventListener('click', () => dialog.close());
-    // A click on the dimmed area (the dialog element itself, outside its content) closes it.
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog) {
-        dialog.close();
+      if (event.target.closest('[data-show-older]')) {
+        showOlderWeeks();
+        return;
+      }
+      const copy = event.target.closest('[data-copy-link]');
+      if (copy) {
+        copyWeekLink(copy);
       }
     });
   }
 
   /**
-   * An inline SVG icon from the sprite in index.html.
+   * Opens a collapsed week: shows its body and removes the expand button.
    *
-   * @param {string} id e.g. 'icon-sun'
-   * @returns {SVGSVGElement}
-   * @example icon('icon-moon');  // <svg><use href="#icon-moon"></use></svg>
+   * @param {HTMLElement} article A [data-week] article.
+   * @example expandWeek(document.getElementById('2026-09-13'));  // body visible, button gone
+   * @example expandWeek(document.getElementById('2026-10-04'));  // already open: nothing changes
    */
-  function icon(id) {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('aria-hidden', 'true');
-    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttribute('href', `#${id}`);
-    svg.append(use);
-    return svg;
+  function expandWeek(article) {
+    if (!article.classList.contains('is-collapsed')) {
+      return;
+    }
+    article.classList.remove('is-collapsed');
+    article.querySelector('.week__body').hidden = false;
+    const button = article.querySelector('.week__expand');
+    if (button) {
+      button.remove();
+    }
+  }
+
+  /** Reveals every week hidden behind "Show older updates" and removes that button. */
+  function showOlderWeeks() {
+    feed.querySelectorAll('[data-older]').forEach((article) => {
+      article.hidden = false;
+    });
+    const button = feed.querySelector('[data-show-older]');
+    if (button) {
+      button.remove();
+    }
   }
 
   /**
-   * Keeps roadmap captions short enough to sit under a node without colliding with the next one.
+   * Opens the week a permalink names, scrolls to it and flashes it. Unknown ids do nothing, so
+   * ordinary anchors (#journey) keep their normal behaviour.
    *
-   * @param {string} text
-   * @returns {string}
-   * @example shorten('Phone number and OTP, consent, roles');  // -> 'Phone number and OTP'
-   * @example shorten('Real families');                          // -> 'Real families'
+   * @param {string} id A week id from the address, e.g. '2026-10-04'.
+   * @param {{instant?: boolean}} [options] `instant` jumps without the smooth scroll (page load).
+   * @returns {boolean} True when the id was a week.
+   * @example revealWeek('2026-10-04');  // smooth-scrolls to the week and flashes it -> true
+   * @example revealWeek('2026-08-16', { instant: true });
+   *          // an old, hidden, collapsed week: shown, expanded, jumped to -> true
+   * @example revealWeek('journey');     // not a week -> false; the browser handles it
    */
-  function shorten(text) {
-    return text.split(',')[0];
+  function revealWeek(id, options = {}) {
+    const article = document.getElementById(id);
+    if (!article || !article.matches('[data-week]')) {
+      return false;
+    }
+    if (article.hidden && 'older' in article.dataset) {
+      showOlderWeeks();
+    }
+    if (article.classList.contains('is-filtered-out')) {
+      applyFilter(null);
+    }
+    expandWeek(article);
+    const smooth = !options.instant && !reducedMotion.matches;
+    article.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' });
+    article.focus({ preventScroll: true });
+    article.classList.remove('is-target');
+    // Force a reflow so re-adding the class restarts the flash when the same week is opened twice.
+    void article.offsetWidth;
+    article.classList.add('is-target');
+    window.setTimeout(() => article.classList.remove('is-target'), TARGET_FLASH_MS);
+    return true;
   }
 
   /**
-   * Escapes text for safe insertion into HTML (the data is ours, but this keeps it that way).
-   *
-   * @param {string} text
-   * @returns {string}
-   * @example escapeHtml('Anjali\'s <b>trip</b>');  // -> 'Anjali&#39;s &lt;b&gt;trip&lt;/b&gt;'
+   * Same-page links to a week (hero card, index, week titles) reveal the week instead of the
+   * browser's plain jump, and keep the address bar on the permalink. Back/forward also reveal.
    */
-  function escapeHtml(text) {
-    return String(text)
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#39;');
+  function wireWeekLinks() {
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link || event.metaKey || event.ctrlKey || event.shiftKey) {
+        return;
+      }
+      const id = decodeURIComponent(link.getAttribute('href').slice(1));
+      if (!document.getElementById(id) || !document.getElementById(id).matches('[data-week]')) {
+        return;
+      }
+      event.preventDefault();
+      if (window.location.hash !== `#${id}`) {
+        window.history.pushState(null, '', `#${id}`);
+      }
+      const jump = link.closest('details');
+      if (jump) {
+        jump.open = false;
+      }
+      revealWeek(id);
+    });
+    window.addEventListener('hashchange', () => revealWeek(decodeURIComponent(window.location.hash.slice(1))));
+  }
+
+  /**
+   * Copies the week's permalink and confirms on the button for COPIED_MS.
+   * The Clipboard API needs a secure page; from file:// or an old browser a hidden text field and
+   * the older copy command do the job instead.
+   *
+   * @param {HTMLButtonElement} button A [data-copy-link="2026-10-04"] button.
+   * @example copyWeekLink(button);  // clipboard: 'https://gts-dev1.github.io/GTS-updates/#2026-10-04'
+   * @example copyWeekLink(button);  // opened from disk: 'file:///C:/…/index.html#2026-10-04'
+   */
+  function copyWeekLink(button) {
+    const url = `${window.location.href.split('#')[0]}#${button.dataset.copyLink}`;
+    const label = button.querySelector('span');
+    const confirm = (text) => {
+      label.textContent = text;
+      window.setTimeout(() => {
+        label.textContent = 'Copy link';
+      }, COPIED_MS);
+    };
+    const fallback = () => {
+      const field = document.createElement('textarea');
+      field.value = url;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.append(field);
+      field.select();
+      const copied = document.execCommand('copy');
+      field.remove();
+      confirm(copied ? 'Copied' : 'Copy failed');
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(() => confirm('Copied'), fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /**
+   * The week index: a sticky list on wide screens and a "Jump to week" menu on phones, both
+   * built from the same list items.
+   *
+   * @example // 1 week -> one entry: '4 Oct' · 'The app runs on a real phone'
+   */
+  function renderWeekIndex() {
+    const items = data.weeks
+      .map(
+        (week) => `
+          <li><a href="#${render.escapeHtml(week.id)}" data-index-link="${render.escapeHtml(week.id)}">
+            <span class="index__date">${render.escapeHtml(render.shortDate(week.id))}</span>
+            <span class="index__title">${render.escapeHtml(week.title)}</span>
+          </a></li>`,
+      )
+      .join('');
+    document.getElementById('week-index-list').innerHTML = items;
+    document.getElementById('jump-list').innerHTML = items;
+    document.getElementById('jump-count').textContent = `${data.weeks.length}`;
+  }
+
+  /**
+   * Marks the week being read in both indexes, using the band READING_BAND of the screen.
+   */
+  function wireReadingTracker() {
+    if (!('IntersectionObserver' in window)) {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) {
+            continue;
+          }
+          for (const link of document.querySelectorAll('[data-index-link]')) {
+            if (link.dataset.indexLink === entry.target.id) {
+              link.setAttribute('aria-current', 'true');
+            } else {
+              link.removeAttribute('aria-current');
+            }
+          }
+        }
+      },
+      { rootMargin: READING_BAND },
+    );
+    feed.querySelectorAll('[data-week]').forEach((article) => observer.observe(article));
+  }
+
+  /**
+   * The area chips: "All" plus one per area in data.areas. Pressing one narrows the highlights.
+   */
+  function renderFilters() {
+    const chips = [{ id: '', label: 'All' }, ...(data.areas || [])]
+      .map(
+        (area) =>
+          `<button type="button" class="chip" data-area="${render.escapeHtml(area.id)}" aria-pressed="${area.id === ''}">${render.escapeHtml(area.label)}</button>`,
+      )
+      .join('');
+    const host = document.getElementById('filters');
+    host.innerHTML = chips;
+    host.addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-area]');
+      if (chip) {
+        applyFilter(chip.dataset.area || null);
+      }
+    });
+  }
+
+  /**
+   * Shows only the highlights tagged with `areaId` (null = everything). A week with no matching
+   * highlight leaves the feed; each remaining week says how many of its highlights match, and the
+   * status line under the chips sums it up for screen readers too.
+   *
+   * @param {string|null} areaId e.g. 'drivers'.
+   * @example applyFilter('drivers');  // 4 October: 1 of 6 highlights; status '1 highlight in 1 update'
+   * @example applyFilter('safety');   // 2 of 6 highlights
+   * @example applyFilter(null);       // everything back; status cleared
+   */
+  function applyFilter(areaId) {
+    const areaLabel = areaId && lookups.areasById[areaId] ? lookups.areasById[areaId].label : '';
+    let matchingHighlights = 0;
+    let matchingWeeks = 0;
+    for (const article of feed.querySelectorAll('[data-week]')) {
+      const cards = article.querySelectorAll('.highlight');
+      let matches = 0;
+      for (const card of cards) {
+        const tagged = !areaId || card.dataset.tags.split(' ').includes(areaId);
+        card.hidden = !tagged;
+        matches += tagged ? 1 : 0;
+      }
+      article.classList.toggle('is-filtered-out', Boolean(areaId) && matches === 0);
+      const note = article.querySelector('.week__filtered');
+      note.hidden = !areaId || matches === 0;
+      note.textContent = areaId ? `Showing ${matches} of ${cards.length} highlights about ${areaLabel}` : '';
+      matchingHighlights += matches;
+      matchingWeeks += matches > 0 ? 1 : 0;
+    }
+    for (const chip of document.querySelectorAll('#filters [data-area]')) {
+      chip.setAttribute('aria-pressed', String((chip.dataset.area || null) === areaId));
+    }
+    const status = document.getElementById('filter-status');
+    if (!areaId) {
+      status.textContent = '';
+    } else if (matchingHighlights === 0) {
+      status.textContent = `Nothing about ${areaLabel} yet.`;
+    } else {
+      status.textContent =
+        `${matchingHighlights} highlight${matchingHighlights === 1 ? '' : 's'} about ${areaLabel} ` +
+        `in ${matchingWeeks} update${matchingWeeks === 1 ? '' : 's'}`;
+    }
   }
 })();

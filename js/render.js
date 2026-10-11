@@ -1,0 +1,376 @@
+/**
+ * The renderer: turns the content of data/updates.js into HTML strings. It does not touch the page
+ * and keeps no state, so the same functions draw index.html (via js/app.js) and the live preview in
+ * compose.html (via js/compose.js); a preview therefore always looks exactly like the real page.
+ *
+ * Every piece of content text goes through `escapeHtml`, so a quote or "<" in an update can never
+ * break the markup.
+ */
+(function defineRenderer(root) {
+  'use strict';
+
+  const icons = root.GTS.icons;
+
+  /** Short month names for the week index, e.g. '4 Oct'. Index = month number - 1. */
+  const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  /** Long month names for a generated date label, e.g. 'Week ending 11 October 2026'. */
+  const MONTHS_LONG = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  /** What each roadmap status says on the page. */
+  const STATUS_LABELS = {
+    done: 'Done',
+    now: 'Building now',
+    next: 'Next',
+    planned: 'Planned',
+    later: 'Later',
+  };
+
+  /**
+   * Escapes text for safe insertion into HTML text and attribute values.
+   *
+   * @param {*} text Anything; null and undefined become ''.
+   * @returns {string}
+   * @example escapeHtml('The van "docks" <home>');  // -> 'The van &quot;docks&quot; &lt;home&gt;'
+   * @example escapeHtml("Parent's view");           // -> 'Parent&#39;s view'
+   * @example escapeHtml(undefined);                 // -> ''
+   */
+  function escapeHtml(text) {
+    if (text === undefined || text === null) {
+      return '';
+    }
+    return String(text)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  /**
+   * A week id as a short date for the week index.
+   *
+   * @param {string} id yyyy-mm-dd.
+   * @returns {string}
+   * @example shortDate('2026-10-04');  // -> '4 Oct'
+   * @example shortDate('2026-12-27');  // -> '27 Dec'
+   * @example shortDate('soon');        // -> 'soon'   not a date: shown as written
+   */
+  function shortDate(id) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(id || '');
+    return match ? `${Number(match[3])} ${MONTHS_SHORT[Number(match[2]) - 1]}` : String(id || '');
+  }
+
+  /**
+   * The standard date label for a week id; compose.html fills it in for the writer.
+   *
+   * @param {string} id yyyy-mm-dd.
+   * @returns {string}
+   * @example weekLabel('2026-10-11');  // -> 'Week ending 11 October 2026'
+   * @example weekLabel('2027-01-03');  // -> 'Week ending 3 January 2027'
+   * @example weekLabel('');            // -> ''
+   */
+  function weekLabel(id) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(id || '');
+    return match ? `Week ending ${Number(match[3])} ${MONTHS_LONG[Number(match[2]) - 1]} ${match[1]}` : '';
+  }
+
+  /**
+   * Splits the roadmap into the road to the pilot and the features after it, with counts the hero
+   * and the road both use.
+   *
+   * @param {{phases: object[]}} roadmap
+   * @returns {{road: object[], later: object[], doneCount: number, current: object|undefined, next: object|undefined}}
+   * @example summariseRoadmap(window.GTS_UPDATES.roadmap);
+   *          // -> { road: [10 phases], later: [7 phases], doneCount: 2,
+   *          //      current: { id: 'driver-setup', ... }, next: { id: 'gts-review', ... } }
+   * @example summariseRoadmap({ phases: [] });  // -> { road: [], later: [], doneCount: 0, current: undefined, next: undefined }
+   */
+  function summariseRoadmap(roadmap) {
+    const summary = { road: [], later: [], doneCount: 0, current: undefined, next: undefined };
+    for (const phase of (roadmap && roadmap.phases) || []) {
+      if (phase.status === 'later') {
+        summary.later.push(phase);
+        continue;
+      }
+      summary.road.push(phase);
+      if (phase.status === 'done') {
+        summary.doneCount += 1;
+      } else if (phase.status === 'now') {
+        summary.current = phase;
+      } else if (phase.status === 'next') {
+        summary.next = phase;
+      }
+    }
+    return summary;
+  }
+
+  /**
+   * The hero's at-a-glance card: stops done out of the road's total, a segmented bar (one segment
+   * per stop), what is being built now and what comes next.
+   *
+   * @param {{phases: object[]}} roadmap
+   * @returns {string}
+   * @example renderGlance(window.GTS_UPDATES.roadmap);
+   *          // '2 of 10 stops to the pilot', 10 segments (2 done, 1 now, 7 to go),
+   *          // 'Building now: Driver setup', 'Next: GTS review'
+   */
+  function renderGlance(roadmap) {
+    const summary = summariseRoadmap(roadmap);
+    const segments = summary.road
+      .map((phase) => `<span class="glance__segment" data-status="${escapeHtml(phase.status)}" title="${escapeHtml(phase.label)}"></span>`)
+      .join('');
+    const row = (label, phase, status) =>
+      phase
+        ? `<div class="glance__row" data-status="${status}">
+             <dt>${label}</dt>
+             <dd>${icons.svg(phase.icon)}<span>${escapeHtml(phase.label)}</span></dd>
+           </div>`
+        : '';
+    return `
+      <p class="glance__eyebrow">Progress to the pilot</p>
+      <p class="glance__count"><strong>${summary.doneCount}</strong><span>of ${summary.road.length} stops done</span></p>
+      <div class="glance__bar" role="img" aria-label="${summary.doneCount} of ${summary.road.length} stops done">${segments}</div>
+      <dl class="glance__rows">
+        ${row('Building now', summary.current, 'now')}
+        ${row('Next', summary.next, 'next')}
+        <div class="glance__row" data-status="later">
+          <dt>After the pilot</dt>
+          <dd>${icons.svg('sparkle')}<span>${summary.later.length} more features</span></dd>
+        </div>
+      </dl>`;
+  }
+
+  /**
+   * The hero's "latest update" card: date, title, summary and the first screenshot in a small
+   * phone frame. Links to the week's permalink.
+   *
+   * @param {object} week The newest week.
+   * @returns {string}
+   * @example renderLatest(window.GTS_UPDATES.weeks[0]);
+   *          // <a class="latest" href="#2026-10-04"> 'Latest · Week ending 4 October 2026',
+   *          // 'The app runs on a real phone', a phone with trip-on-the-way-dark.jpg
+   * @example renderLatest({ ...week, gallery: [] });  // the same card without the phone
+   */
+  function renderLatest(week) {
+    const cover = week.gallery && week.gallery[0];
+    const phone = cover
+      ? `<span class="latest__phone device device--mini" aria-hidden="true"><span class="device__screen">
+           <img src="${escapeHtml(cover.src)}" alt="" decoding="async" /></span></span>`
+      : '';
+    return `
+      <a class="latest" href="#${escapeHtml(week.id)}">
+        <span class="latest__text">
+          <span class="latest__eyebrow"><span class="pill pill--live">Latest</span><time datetime="${escapeHtml(week.id)}">${escapeHtml(week.dateLabel)}</time></span>
+          <span class="latest__title">${escapeHtml(week.title)}</span>
+          <span class="latest__summary">${escapeHtml(week.summary)}</span>
+          <span class="latest__cta">Read the update ${icons.svg('arrow')}</span>
+        </span>
+        ${phone}
+      </a>`;
+  }
+
+  /**
+   * The journey road: every stop to the pilot as a list item on a road, lit up to the stop being
+   * built, then the features after the pilot as a grid. CSS draws the road horizontally on wide
+   * screens and vertically on phones; `--stops` sets the number of columns. A stop's status is
+   * shown as a pill ('Building now', 'Next') or, for the others, as text for screen readers only.
+   *
+   * @param {{phases: object[]}} roadmap
+   * @returns {string}
+   * @example renderRoadmap(window.GTS_UPDATES.roadmap);
+   *          // <ol class="road" style="--stops: 10"> with stop 3 (Driver setup) 'Building now',
+   *          // then 'After the pilot' with 7 cards
+   * @example renderRoadmap({ phases: everyPhaseDone });  // every stop green with a check; no pill
+   */
+  function renderRoadmap(roadmap) {
+    const summary = summariseRoadmap(roadmap);
+    const count = summary.road.length;
+    const stops = summary.road
+      .map((phase, index) => {
+        const isGoal = index === count - 1;
+        const markerIcon = phase.status === 'done' ? 'check' : phase.status === 'now' ? 'van' : isGoal ? 'flag' : phase.icon;
+        const pill =
+          phase.status === 'now' || phase.status === 'next'
+            ? `<span class="pill pill--${phase.status}">${STATUS_LABELS[phase.status]}</span>`
+            : `<span class="visually-hidden">(${STATUS_LABELS[phase.status] || ''})</span>`;
+        return `
+          <li class="stop" data-status="${escapeHtml(phase.status)}"${isGoal ? ' data-goal' : ''}${phase.status === 'now' ? ' aria-current="step"' : ''}>
+            <span class="stop__marker">${icons.svg(markerIcon)}</span>
+            <span class="stop__text">
+              <span class="stop__label">${escapeHtml(phase.label)}</span>
+              <span class="stop__detail">${escapeHtml(phase.detail)}</span>
+              ${pill}
+            </span>
+          </li>`;
+      })
+      .join('');
+    const later = summary.later
+      .map(
+        (phase) => `
+          <li class="later__item">
+            <span class="later__icon">${icons.svg(phase.icon)}</span>
+            <span><span class="later__label">${escapeHtml(phase.label)}</span>
+            <span class="later__detail">${escapeHtml(phase.detail)}</span></span>
+          </li>`,
+      )
+      .join('');
+    return `
+      <ol class="road" style="--stops: ${count}">${stops}</ol>
+      ${later ? `<div class="later"><h3 class="later__title">After the pilot <span>from the full product plan</span></h3><ul class="later__grid">${later}</ul></div>` : ''}`;
+  }
+
+  /**
+   * One screenshot in a phone frame, as a button that opens the viewer.
+   *
+   * @param {{src: string, caption: string, alt?: string}} shot
+   * @param {string} src The address to load (compose.html swaps in a local preview).
+   * @returns {string}
+   * @example renderShot({ src: 'a.jpg', caption: 'Arrived' }, 'a.jpg');
+   *          // <figure class="shot"><button class="device" data-shot data-src="a.jpg" ...><img alt="Arrived">
+   * @example renderShot({ src: 'a.jpg', caption: 'Arrived', alt: 'Van icon inside the home circle' }, 'a.jpg');
+   *          // the image's alt says the longer text; the caption stays 'Arrived'
+   */
+  function renderShot(shot, src) {
+    const alt = shot.alt || shot.caption;
+    return `
+      <figure class="shot">
+        <button type="button" class="device" data-shot data-src="${escapeHtml(src)}" data-caption="${escapeHtml(shot.caption)}"
+                data-alt="${escapeHtml(alt)}" aria-label="View larger: ${escapeHtml(shot.caption)}">
+          <span class="device__screen"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" /></span>
+        </button>
+        <figcaption>${escapeHtml(shot.caption)}</figcaption>
+      </figure>`;
+  }
+
+  /**
+   * One week as an <article>: header (number, date, phase, title, summary, link), then the body
+   * (highlights, phone gallery, feature image, coming next). A collapsed week hides its body behind
+   * a "Show the full week" button; js/app.js wires that button.
+   *
+   * @param {object} week An entry from data/updates.js.
+   * @param {{number: number, areasById: object, phasesById: object, collapsed?: boolean,
+   *          resolveSrc?: (src: string) => string}} context
+   *   `number` is the update's count from the first one (the oldest is 1); `resolveSrc` lets the
+   *   compose preview show a picked file before it is in the assets folder.
+   * @returns {string}
+   * @example renderWeek(weeks[0], { number: 1, areasById, phasesById });
+   *          // <article class="week" id="2026-10-04"> 'Update 1', 'Week ending 4 October 2026',
+   *          // 'Foundation', 6 highlight cards, 6 phones, the wide sky image, 3 'Coming next' items
+   * @example renderWeek(weeks[3], { number: 2, areasById, phasesById, collapsed: true });
+   *          // the same header; body hidden; button 'Show the full week · 6 highlights · 4 screenshots'
+   * @example renderWeek({ ...week, gallery: [], feature: undefined }, context);
+   *          // no gallery block at all, not an empty one
+   */
+  function renderWeek(week, context) {
+    const resolveSrc = context.resolveSrc || ((src) => src);
+    const id = escapeHtml(week.id);
+    const phase = week.phase && context.phasesById[week.phase];
+    const highlights = week.highlights || [];
+    const gallery = week.gallery || [];
+
+    const highlightCards = highlights
+      .map((item) => {
+        const tags = item.tags || [];
+        const tagLabels = tags
+          .map((tag) => (context.areasById[tag] ? context.areasById[tag].label : tag))
+          .map((label) => `<li>${escapeHtml(label)}</li>`)
+          .join('');
+        return `
+          <li class="highlight" data-tags="${escapeHtml(tags.join(' '))}">
+            <span class="highlight__icon">${icons.svg(item.icon)}</span>
+            <h4 class="highlight__title">${escapeHtml(item.title)}</h4>
+            <p class="highlight__text">${escapeHtml(item.text)}</p>
+            ${tagLabels ? `<ul class="highlight__tags" aria-label="Areas">${tagLabels}</ul>` : ''}
+          </li>`;
+      })
+      .join('');
+
+    const galleryBlock = gallery.length
+      ? `<div class="gallery"><ul class="gallery__track" aria-label="Screenshots">${gallery
+          .map((shot) => `<li>${renderShot(shot, resolveSrc(shot.src))}</li>`)
+          .join('')}</ul></div>`
+      : '';
+
+    const feature = week.feature
+      ? `<figure class="feature">
+           <button type="button" class="feature__frame" data-shot data-src="${escapeHtml(resolveSrc(week.feature.src))}"
+                   data-caption="${escapeHtml(week.feature.caption)}" data-alt="${escapeHtml(week.feature.alt || week.feature.caption)}"
+                   aria-label="View larger: ${escapeHtml(week.feature.caption)}">
+             <img src="${escapeHtml(resolveSrc(week.feature.src))}" alt="${escapeHtml(week.feature.alt || week.feature.caption)}" loading="lazy" decoding="async" />
+             <span class="feature__zoom">${icons.svg('expand')}</span>
+           </button>
+           <figcaption>${escapeHtml(week.feature.caption)}</figcaption>
+         </figure>`
+      : '';
+
+    const next = (week.next || []).length
+      ? `<aside class="next" aria-label="Coming next">
+           <h4 class="next__title">${icons.svg('route')} Coming next</h4>
+           <ul class="next__list">${week.next.map((item) => `<li>${icons.svg('chevron-right')}<span>${escapeHtml(item)}</span></li>`).join('')}</ul>
+         </aside>`
+      : '';
+
+    const shotCount = gallery.length + (week.feature ? 1 : 0);
+    const expandLabel =
+      `Show the full week · ${highlights.length} highlight${highlights.length === 1 ? '' : 's'}` +
+      (shotCount ? ` · ${shotCount} screenshot${shotCount === 1 ? '' : 's'}` : '');
+
+    return `
+      <article class="week${context.collapsed ? ' is-collapsed' : ''}" id="${id}" data-week aria-labelledby="title-${id}">
+        <header class="week__head">
+          <div class="week__meta">
+            <span class="week__number">Update ${context.number}</span>
+            <time datetime="${id}">${escapeHtml(week.dateLabel)}</time>
+            ${phase ? `<span class="week__phase">${icons.svg(phase.icon)}${escapeHtml(phase.label)}</span>` : ''}
+          </div>
+          <h3 class="week__title" id="title-${id}"><a href="#${id}">${escapeHtml(week.title)}</a></h3>
+          <p class="week__summary">${escapeHtml(week.summary)}</p>
+          <button type="button" class="week__copy" data-copy-link="${id}">${icons.svg('link')}<span>Copy link</span></button>
+        </header>
+        <div class="week__body" id="body-${id}"${context.collapsed ? ' hidden' : ''}>
+          ${highlightCards ? `<ul class="highlights">${highlightCards}</ul>` : ''}
+          <p class="week__filtered" hidden></p>
+          ${galleryBlock}
+          ${feature}
+          ${next}
+        </div>
+        ${context.collapsed ? `<button type="button" class="week__expand" aria-expanded="false" aria-controls="body-${id}">${icons.svg('chevron-down')}<span>${escapeHtml(expandLabel)}</span></button>` : ''}
+      </article>`;
+  }
+
+  /**
+   * Lookup tables the week renderer needs, built once from the data.
+   *
+   * @param {object} data window.GTS_UPDATES.
+   * @returns {{areasById: object, phasesById: object}}
+   * @example indexData(window.GTS_UPDATES).areasById.safety.label;           // -> 'Safety & privacy'
+   * @example indexData(window.GTS_UPDATES).phasesById['driver-setup'].status; // -> 'now'
+   * @example indexData({}).areasById;                                         // -> {}
+   */
+  function indexData(data) {
+    const areasById = {};
+    const phasesById = {};
+    for (const area of data.areas || []) {
+      areasById[area.id] = area;
+    }
+    for (const phase of (data.roadmap && data.roadmap.phases) || []) {
+      phasesById[phase.id] = phase;
+    }
+    return { areasById, phasesById };
+  }
+
+  root.GTS.render = {
+    escapeHtml,
+    shortDate,
+    weekLabel,
+    summariseRoadmap,
+    renderGlance,
+    renderLatest,
+    renderRoadmap,
+    renderWeek,
+    indexData,
+  };
+})(window);

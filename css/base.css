@@ -1,0 +1,468 @@
+/*
+  GTS updates — base: colour tokens (the GTS app's palette), type, layout container, top bar and the
+  small shared pieces (buttons, pills, chips, cards). Section styles live in hero.css, road.css,
+  updates.css and lightbox.css; compose.css adds the posting tool.
+
+  THEME: light tokens on :root; dark tokens when the system is dark and the reader has not chosen
+  light, or when the reader chose dark (data-theme set by js/theme.js). The colours are the app's
+  GtsColors: night #070B1F / #10173A, amber #FFC233, live cyan #40D9FF, success #3EE6A0, alert
+  #FF6B6B; day #F3F6FC / #FFFFFF, live #0277A8, success #0B7F55, alert #C62828.
+  Text colours are chosen for WCAG AA on their backgrounds (amber is never used for text on light).
+*/
+
+:root {
+  color-scheme: light;
+
+  --bg: #f3f6fc;
+  --bg-sunken: #e9eef8;
+  --panel: #ffffff;
+  --panel-raised: #f7f9fe;
+  --line: #dce3f1;
+  --line-strong: #c3cde4;
+  --ink: #0b1233;
+  --ink-muted: #46506f;
+  --ink-soft: #5f6987;
+  --brand: #ffc233;
+  --brand-soft: #fff1cc;
+  --brand-ink: #8a5a00;
+  --on-brand: #1b1300;
+  --live: #0277a8;
+  --live-soft: #e0f1f9;
+  --live-ink: #025f87;
+  --success-ink: #08664a;
+  --success: #0b7f55;
+  --success-soft: #def4ea;
+  --on-success: #ffffff;
+  --alert: #c62828;
+  --road: #d3dbec;
+  --road-mark: #ffffff;
+  --device: #0b0f24;
+  --device-edge: #2b3352;
+  --shadow-soft: 0 1px 2px rgb(11 18 51 / 0.06), 0 8px 24px -12px rgb(11 18 51 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(11 18 51 / 0.06), 0 22px 44px -22px rgb(11 18 51 / 0.35);
+  --topbar-bg: rgb(243 246 252 / 0.82);
+  --flash: rgb(2 119 168 / 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #070b1f;
+    --bg-sunken: #050818;
+    --panel: #10173a;
+    --panel-raised: #151d47;
+    --line: #222b5c;
+    --line-strong: #323d78;
+    --ink: #f2f4ff;
+    --ink-muted: #b0b8de;
+    --ink-soft: #8f99c6;
+    --brand-soft: #2c2610;
+    --brand-ink: #ffc233;
+    --live: #40d9ff;
+    --live-soft: #0d2a45;
+    --live-ink: #40d9ff;
+    --success-ink: #3ee6a0;
+    --success: #3ee6a0;
+    --success-soft: #0c2e2a;
+    --on-success: #04261a;
+    --alert: #ff6b6b;
+    --road: #1c2452;
+    --road-mark: #3a4687;
+    --device: #03050f;
+    --device-edge: #2a3266;
+    --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -20px rgb(0 0 0 / 0.75);
+    --topbar-bg: rgb(7 11 31 / 0.8);
+    --flash: rgb(64 217 255 / 0.14);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #070b1f;
+  --bg-sunken: #050818;
+  --panel: #10173a;
+  --panel-raised: #151d47;
+  --line: #222b5c;
+  --line-strong: #323d78;
+  --ink: #f2f4ff;
+  --ink-muted: #b0b8de;
+  --ink-soft: #8f99c6;
+  --brand-soft: #2c2610;
+  --brand-ink: #ffc233;
+  --live: #40d9ff;
+  --live-soft: #0d2a45;
+  --live-ink: #40d9ff;
+  --success-ink: #3ee6a0;
+  --success: #3ee6a0;
+  --success-soft: #0c2e2a;
+  --on-success: #04261a;
+  --alert: #ff6b6b;
+  --road: #1c2452;
+  --road-mark: #3a4687;
+  --device: #03050f;
+  --device-edge: #2a3266;
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -20px rgb(0 0 0 / 0.75);
+  --topbar-bg: rgb(7 11 31 / 0.8);
+  --flash: rgb(64 217 255 / 0.14);
+}
+
+/* Scale: spacing in 4 px steps, radii, type and the page width. */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 72px;
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --font: "Anek Latin", "Anek Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --wide: 112%;
+  --page-max: 1200px;
+  --gutter: 16px;
+  --topbar-height: 60px;
+}
+
+@media (min-width: 600px) {
+  :root {
+    --gutter: 28px;
+  }
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--topbar-height) + var(--space-4));
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--live);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.icon {
+  width: 1.25em;
+  height: 1.25em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -60px;
+  z-index: 50;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-s);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow-lift);
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+/* ---------- Top bar: brand, section links, theme toggle; frosted and sticky ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--topbar-bg);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: var(--page-max);
+  height: var(--topbar-height);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.brand__tile {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+}
+
+.brand__name {
+  font-weight: 800;
+  font-stretch: var(--wide);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+}
+
+.brand__sub {
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: 16px;
+  padding-left: var(--space-2);
+  border-left: 1px solid var(--line-strong);
+}
+
+.topbar__nav {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.topbar__nav a {
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ink-muted);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.topbar__nav a:hover {
+  color: var(--ink);
+  background: var(--bg-sunken);
+}
+
+@media (max-width: 420px) {
+  .topbar__nav a {
+    padding: 6px 8px;
+  }
+  .brand__sub {
+    display: none;
+  }
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  border-color: var(--line-strong);
+}
+
+/* The toggle shows the theme it switches TO: a moon in light mode, a sun in dark mode. */
+.icon--theme-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .icon--theme-light {
+  display: block;
+}
+
+:root[data-theme="dark"] .icon--theme-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon--theme-light {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .icon--theme-dark {
+    display: none;
+  }
+}
+
+/* ---------- Shared pieces ---------- */
+main {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.eyebrow {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-ink);
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-soft);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.pill--live,
+.pill--next {
+  background: var(--live-soft);
+  color: var(--live-ink);
+}
+
+.pill--now {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+}
+
+.chip {
+  flex: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-muted);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+.section-head {
+  margin-bottom: var(--space-5);
+}
+
+.section-title {
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 700;
+  font-stretch: var(--wide);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.section-sub {
+  margin-top: var(--space-2);
+  color: var(--ink-muted);
+  max-width: 60ch;
+}
+
+.empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.footer {
+  max-width: var(--page-max);
+  margin: var(--space-8) auto 0;
+  padding: var(--space-6) var(--gutter) var(--space-7);
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
