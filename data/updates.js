@@ -106,9 +106,9 @@ window.GTS_UPDATES = {
     phases: [
       { id: 'foundation', label: 'Foundation', detail: 'App skeleton, journey alerts, design system', icon: 'phone', status: 'done' },
       { id: 'sign-in', label: 'Sign-in', detail: 'Phone number and one-time code, consent, roles', icon: 'key', status: 'done' },
-      { id: 'driver-setup', label: 'Driver setup', detail: 'Vehicle, papers, schools, invite code', icon: 'van', status: 'now' },
-      { id: 'gts-review', label: 'GTS review', detail: 'GTS staff check papers, approve or reject', icon: 'shield', status: 'next' },
-      { id: 'parent-joins', label: 'Parent joins', detail: 'Invite code, child, pickup point', icon: 'users', status: 'planned' },
+      { id: 'driver-setup', label: 'Driver setup', detail: 'Vehicle, papers, schools, invite code', icon: 'van', status: 'done' },
+      { id: 'gts-review', label: 'GTS review', detail: 'GTS staff check papers, approve or reject', icon: 'shield', status: 'now' },
+      { id: 'parent-joins', label: 'Parent joins', detail: 'Invite code, child, pickup point', icon: 'users', status: 'next' },
       { id: 'live-trips', label: 'Live trips', detail: 'Real GPS and a live map for parents', icon: 'map-pin', status: 'planned' },
       { id: 'alerts', label: 'Alerts', detail: 'Near home, reached and left school, delays, SOS', icon: 'bell', status: 'planned' },
       { id: 'settings-privacy', label: 'Settings & privacy', detail: 'Account deletion, grievance contact', icon: 'settings', status: 'planned' },
@@ -126,6 +126,118 @@ window.GTS_UPDATES = {
 
   /** One entry per week, newest first. Paste a new week ABOVE the first one. */
   weeks: [
+    {
+      id: '2026-10-11',
+      dateLabel: 'Week ending 11 October 2026',
+      title: 'Sign-in and driver setup, tested on a real phone',
+      summary:
+        'GTS now has its front door and its driver setup. People choose a language, read what the ' +
+        'app uses and why, and sign in with a mobile number and a one-time code. Drivers send ' +
+        'their vehicle and papers for checking, add the schools they drive to, and share an invite ' +
+        'code. Everything was run on an Android phone, and what the run showed was fixed the same day.',
+      phase: 'driver-setup',
+      highlights: [
+        {
+          icon: 'key',
+          title: 'Sign in with your number',
+          text:
+            'A 10-digit mobile number and a 6-digit SMS code. No passwords; the code can be sent ' +
+            'again after 30 seconds.',
+          tags: ['parents', 'drivers'],
+        },
+        {
+          icon: 'shield',
+          title: 'Consent before anything',
+          text:
+            'A plain notice lists each piece of data and why it is needed. Nothing is ticked for ' +
+            'you, and the app cannot continue until you agree.',
+          tags: ['safety'],
+        },
+        {
+          icon: 'language',
+          title: 'Your language, one tap away',
+          text:
+            'English and हिन्दी side by side at the top of every sign-up screen, so a language ' +
+            'chosen by mistake never leaves anyone stuck on screens they cannot read.',
+          tags: ['parents', 'drivers', 'design'],
+        },
+        {
+          icon: 'file',
+          title: 'Papers as photos or PDFs',
+          text:
+            "Drivers photograph their licence, RC, permit, insurance and police verification with " +
+            "the phone's own camera app, or choose the PDF they downloaded from DigiLocker.",
+          tags: ['drivers'],
+        },
+        {
+          icon: 'check',
+          title: 'Every driver checked',
+          text:
+            'Papers wait for GTS approval. If something is wrong the driver sees why, fixes it and ' +
+            'sends again; papers cannot be changed while they are being checked.',
+          tags: ['drivers', 'safety'],
+        },
+        {
+          icon: 'map-pin',
+          title: 'No coordinates to type',
+          text:
+            "A school's gate is set by standing there and tapping once, by moving a map under a " +
+            'pin, or by dropping a pin in Google Maps and sharing it to GTS.',
+          tags: ['drivers', 'design'],
+        },
+        {
+          icon: 'users',
+          title: 'Invite parents',
+          text:
+            'Each driver gets a 6-character code to copy or share on WhatsApp. Codes skip look-alike ' +
+            'characters, so 0 and O are never confused.',
+          tags: ['drivers', 'parents'],
+        },
+        {
+          icon: 'radar',
+          title: 'Kind to the battery',
+          text:
+            'Animations pause on battery saver or low battery. Parents can choose Auto, Always on ' +
+            'or Always calm in Settings.',
+          tags: ['design', 'tech'],
+        },
+        {
+          icon: 'lock',
+          title: 'Locked down by default',
+          text:
+            'Each person reads only their own data, a driver can never approve themselves, and 60 ' +
+            'automated checks prove what is allowed and what is refused.',
+          tags: ['safety', 'tech'],
+        },
+      ],
+      gallery: [
+        { src: 'assets/updates/2026-10-11/privacy-notice.jpg', caption: 'What GTS uses and why, with the language switch on top' },
+        { src: 'assets/updates/2026-10-11/privacy-notice-hindi.jpg', caption: 'One tap on हिन्दी: the same screen in Hindi' },
+        { src: 'assets/updates/2026-10-11/sign-in-number.jpg', caption: 'Sign in with a mobile number' },
+        { src: 'assets/updates/2026-10-11/sign-in-code.jpg', caption: 'The 6-digit code' },
+        { src: 'assets/updates/2026-10-11/driver-home.jpg', caption: "A driver's checklist for the first trip" },
+        { src: 'assets/updates/2026-10-11/papers-photo-or-pdf.jpg', caption: 'Five papers: a PDF from DigiLocker and four photos' },
+        { src: 'assets/updates/2026-10-11/papers-waiting.jpg', caption: 'Sent: waiting for GTS approval, papers locked' },
+        { src: 'assets/updates/2026-10-11/papers-not-approved.jpg', caption: 'Not approved: the reason, then send again' },
+        { src: 'assets/updates/2026-10-11/driver-approved.jpg', caption: 'Approved by GTS' },
+        { src: 'assets/updates/2026-10-11/add-school-ways.jpg', caption: 'Three ways to set a school gate, no numbers' },
+        { src: 'assets/updates/2026-10-11/share-from-google-maps.jpg', caption: 'Drop a pin in Google Maps and share it to GTS' },
+        { src: 'assets/updates/2026-10-11/school-from-google-maps.jpg', caption: 'Shared from Google Maps: name and gate filled in' },
+        { src: 'assets/updates/2026-10-11/my-schools.jpg', caption: "The driver's schools" },
+        { src: 'assets/updates/2026-10-11/invite-code.jpg', caption: 'The invite code, copied' },
+        { src: 'assets/updates/2026-10-11/settings.jpg', caption: 'Settings: language first' },
+      ],
+      feature: {
+        src: 'assets/updates/2026-10-11/app-icons.jpg',
+        caption: 'The new app icon: the GTS van on amber, and on indigo for the test version',
+        alt: 'Two rounded app icons: a dark van on amber, and an amber van on dark indigo',
+      },
+      next: [
+        'GTS review screens: approve or reject a driver, with a reason',
+        'Parents join a driver with the invite code and add their child',
+        'Setting the home pickup point the same easy way as a school gate',
+      ],
+    },
     {
       id: '2026-10-04',
       dateLabel: 'Week ending 4 October 2026',
