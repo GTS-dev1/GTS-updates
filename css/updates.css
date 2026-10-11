@@ -10,6 +10,8 @@
 }
 
 .updates__head {
+  /* The anchor of the phone "Jump to week" menu. */
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -19,7 +21,9 @@
 
 /* ---------- Phone week menu (wide screens use the sidebar instead) ---------- */
 .jump {
-  position: relative;
+  /* Not the menu's anchor: the header row is (see .updates__head), so the menu spans the column
+     whether the button sits beside the title or wraps under it. */
+  position: static;
 }
 
 .jump summary {
@@ -53,9 +57,12 @@
 .jump__list {
   position: absolute;
   z-index: 15;
+  /* Full column width under the header row. Anchored to the button instead, it ran off the left
+     edge when the button wrapped under the title (iPhone 16, 393 px) and off the right edge when
+     it sat beside it. */
+  left: 0;
   right: 0;
   top: calc(100% + 8px);
-  width: min(320px, calc(100vw - 2 * var(--gutter)));
   max-height: 60vh;
   overflow: auto;
   padding: var(--space-2);

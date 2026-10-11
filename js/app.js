@@ -50,6 +50,7 @@
   renderFilters();
   lightbox.wire(document.getElementById('lightbox'));
   wireWeekLinks();
+  wireJumpMenu();
   wireReadingTracker();
   if (window.location.hash) {
     // Opened from a permalink: jump straight there (no animation on arrival), then line it up
@@ -200,6 +201,30 @@
       revealWeek(id);
     });
     window.addEventListener('hashchange', () => revealWeek(decodeURIComponent(window.location.hash.slice(1))));
+  }
+
+  /**
+   * The phone "Jump to week" menu is a native <details>, which stays open until its own button is
+   * pressed again. As a menu it should also close on a tap anywhere else (it covers the filter
+   * chips) and on Escape, which returns focus to the button.
+   *
+   * @example // menu open, tap a filter chip  -> menu closes
+   * @example // menu open, tap inside the list -> stays open until a week link is chosen
+   * @example // menu open, Escape              -> closes; focus back on "Jump to week"
+   */
+  function wireJumpMenu() {
+    const menu = document.querySelector('.jump');
+    document.addEventListener('click', (event) => {
+      if (menu.open && !menu.contains(event.target)) {
+        menu.open = false;
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary').focus();
+      }
+    });
   }
 
   /**
