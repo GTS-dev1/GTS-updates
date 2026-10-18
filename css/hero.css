@@ -258,6 +258,26 @@
   background: var(--line-strong);
 }
 
+/* The newest week's estimates (css/base.css .estimates): on this narrow card each one is a row,
+   label left and figure right, so "about 40–45%" never breaks over two lines. */
+.glance .estimates__list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.glance .estimates__item {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: 10px 14px;
+}
+
+.glance .estimates__item dd {
+  font-size: 18px;
+  white-space: nowrap;
+}
+
 .glance__rows {
   display: grid;
   gap: var(--space-3);

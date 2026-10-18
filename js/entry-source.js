@@ -32,21 +32,30 @@
   }
 
   /**
-   * An image object on one line: `{ src: '…', caption: '…' }`, plus `alt` when given.
+   * A gallery item or the wide image on one line, fields in the data file's order: a screenshot
+   * `{ src, caption }` or a video `{ video, poster, caption }`, then `alt` and `group` when given.
    *
-   * @example imageSource({ src: 'assets/updates/2026-10-11/otp.jpg', caption: 'Typing the code' });
+   * @example mediaSource({ src: 'assets/updates/2026-10-11/otp.jpg', caption: 'Typing the code' });
    *          // -> "{ src: 'assets/updates/2026-10-11/otp.jpg', caption: 'Typing the code' }"
-   * @example imageSource({ src: 'a.jpg', caption: 'Map', alt: 'Map with the school pin' });
+   * @example mediaSource({ src: 'a.jpg', caption: 'Map', alt: 'Map with the school pin' });
    *          // -> "{ src: 'a.jpg', caption: 'Map', alt: 'Map with the school pin' }"
+   * @example mediaSource({ src: 'a.jpg', caption: 'Battery guide', group: 'Starting a trip' });
+   *          // -> "{ src: 'a.jpg', caption: 'Battery guide', group: 'Starting a trip' }"
+   * @example mediaSource({ video: 'trip.mp4', poster: 'trip.jpg', caption: 'A whole trip' });
+   *          // -> "{ video: 'trip.mp4', poster: 'trip.jpg', caption: 'A whole trip' }"
    */
-  function imageSource(image) {
-    const alt = image.alt ? `, alt: ${quote(image.alt)}` : '';
-    return `{ src: ${quote(image.src)}, caption: ${quote(image.caption)}${alt} }`;
+  function mediaSource(item) {
+    const file = item.video !== undefined
+      ? `video: ${quote(item.video)}, poster: ${quote(item.poster)}`
+      : `src: ${quote(item.src)}`;
+    const alt = item.alt ? `, alt: ${quote(item.alt)}` : '';
+    const group = item.group ? `, group: ${quote(item.group)}` : '';
+    return `{ ${file}, caption: ${quote(item.caption)}${alt}${group} }`;
   }
 
   /**
-   * The whole entry, in field order id, dateLabel, title, summary, phase, highlights, gallery,
-   * feature, next. Optional fields that are absent are left out.
+   * The whole entry, in field order id, dateLabel, title, summary, phase, progress, highlights,
+   * gallery, galleryNote, cover, feature, next. Optional fields that are absent are left out.
    *
    * @param {object} week A week entry (the shape documented in data/updates.js).
    * @returns {string} Source text ending in '},' ready to paste.
@@ -70,6 +79,8 @@
    *          //        },
    * @example entrySource({ ...week, phase: 'sign-in', feature: { src: 'a.jpg', caption: 'All screens' } });
    *          // adds "phase: 'sign-in'," after summary and "feature: { src: 'a.jpg', caption: 'All screens' }," before next
+   * @example entrySource({ ...week, progress: { estimates: [{ label: 'Whole product', value: 'about 25%' }], note: 'Measured…' } });
+   *          // adds after phase:  progress: { estimates: [ { label: 'Whole product', value: 'about 25%' }, ], note: 'Measured…' },
    */
   function entrySource(week) {
     const pad1 = ENTRY_INDENT + STEP;
@@ -80,6 +91,13 @@
       if (week[field] !== undefined) {
         lines.push(`${pad1}${field}: ${quote(week[field])},`);
       }
+    }
+    if (week.progress) {
+      lines.push(`${pad1}progress: {`, `${pad2}estimates: [`);
+      for (const estimate of week.progress.estimates || []) {
+        lines.push(`${pad3}{ label: ${quote(estimate.label)}, value: ${quote(estimate.value)} },`);
+      }
+      lines.push(`${pad2}],`, `${pad2}note: ${quote(week.progress.note)},`, `${pad1}},`);
     }
     lines.push(`${pad1}highlights: [`);
     for (const item of week.highlights || []) {
@@ -97,13 +115,18 @@
       lines.push(`${pad1}gallery: [],`);
     } else {
       lines.push(`${pad1}gallery: [`);
-      for (const image of week.gallery) {
-        lines.push(`${pad2}${imageSource(image)},`);
+      for (const item of week.gallery) {
+        lines.push(`${pad2}${mediaSource(item)},`);
       }
       lines.push(`${pad1}],`);
     }
+    for (const field of ['galleryNote', 'cover']) {
+      if (week[field] !== undefined) {
+        lines.push(`${pad1}${field}: ${quote(week[field])},`);
+      }
+    }
     if (week.feature) {
-      lines.push(`${pad1}feature: ${imageSource(week.feature)},`);
+      lines.push(`${pad1}feature: ${mediaSource(week.feature)},`);
     }
     lines.push(`${pad1}next: [`);
     for (const item of week.next || []) {

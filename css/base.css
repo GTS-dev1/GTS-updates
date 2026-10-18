@@ -443,6 +443,46 @@ main {
   color: var(--ink-muted);
 }
 
+/* Progress estimates (a week's `progress`, js/render.js renderEstimates): each figure above its
+   label, side by side, then one line on how they are measured. Used on the hero card and at the
+   top of a week. */
+.estimates__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.estimates__item {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-s);
+  background: var(--bg-sunken);
+}
+
+.estimates__item dt {
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+.estimates__item dd {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  font-stretch: var(--wide);
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.estimates__note {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
 .footer {
   max-width: var(--page-max);
   margin: var(--space-8) auto 0;

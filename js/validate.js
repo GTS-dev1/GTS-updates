@@ -5,11 +5,13 @@
  *
  * WHAT it checks: required fields and their types, ids that are real dates and unique, newest
  * first, icons and tags that exist, roadmap statuses in journey order, gallery files that exist
- * (when the caller can look at the disk), captions present, and text that looks private for a
- * PUBLIC repository (money, legal words, phone numbers, email addresses).
+ * (when the caller can look at the disk), videos small enough for GitHub Pages (when the caller can
+ * measure them), captions present, a gallery's sections kept together, a cover taken from the
+ * gallery, and text that looks private for a PUBLIC repository (money, legal words, phone numbers,
+ * email addresses).
  *
  * HOW: plain functions that return a list of problem strings; an empty list means clean.
- * Nothing here touches the disk or the page; callers pass `fileExists` when they can.
+ * Nothing here touches the disk or the page; callers pass `fileExists` and `fileSize` when they can.
  */
 (function defineValidator(root) {
   'use strict';
@@ -18,9 +20,22 @@
   const PHASE_STATUS_ORDER = ['done', 'now', 'next', 'planned', 'later'];
 
   /** The fields a week may have; anything else is almost always a typo ('higlights'). */
-  const WEEK_KEYS = ['id', 'dateLabel', 'title', 'summary', 'phase', 'highlights', 'gallery', 'feature', 'next'];
+  const WEEK_KEYS = [
+    'id', 'dateLabel', 'title', 'summary', 'phase', 'progress', 'highlights', 'gallery', 'galleryNote', 'cover',
+    'feature', 'next',
+  ];
+  /** A week's progress estimates: the figures and the line on how they are measured. */
+  const PROGRESS_KEYS = ['estimates', 'note'];
+  const ESTIMATE_KEYS = ['label', 'value'];
+  /** More figures than this stop being "at a glance". */
+  const MAX_ESTIMATES = 4;
   const HIGHLIGHT_KEYS = ['icon', 'title', 'text', 'tags'];
+  /** The wide feature image. */
   const IMAGE_KEYS = ['src', 'caption', 'alt'];
+  /** A screenshot in the gallery: an image that may also name its section. */
+  const SHOT_KEYS = ['src', 'caption', 'alt', 'group'];
+  /** A screen-recording video in the gallery. */
+  const VIDEO_KEYS = ['video', 'poster', 'caption', 'alt', 'group'];
   const PHASE_KEYS = ['id', 'label', 'detail', 'icon', 'status'];
 
   /** More highlights than this stop reading as highlights; split the week's story instead. */
@@ -32,6 +47,15 @@
   const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
   /** Screenshot formats browsers show everywhere. */
   const IMAGE_FILE_PATTERN = /\.(jpe?g|png|webp)$/i;
+  /** Video formats every current browser plays in a <video> element. */
+  const VIDEO_FILE_PATTERN = /\.(mp4|webm)$/i;
+  /**
+   * The largest video the checker accepts: 15 MB. WHY: GitHub Pages serves the repository as it
+   * is, a phone on mobile data downloads the whole file when play is pressed, and GitHub itself
+   * warns on files over 50 MB.
+   */
+  const MAX_VIDEO_BYTES = 15 * 1024 * 1024;
+  const BYTES_PER_MB = 1024 * 1024;
 
   /**
    * Text that should not appear in this public repository. Each entry: what to look for and the
@@ -111,42 +135,230 @@
     }
   }
 
+  /** What a screenshot or poster file must be. */
+  const IMAGE_KIND = { pattern: IMAGE_FILE_PATTERN, types: '.jpg, .png or .webp' };
+  /** What a video file must be. */
+  const VIDEO_KIND = { pattern: VIDEO_FILE_PATTERN, types: '.mp4 or .webm' };
+
   /**
-   * Checks one gallery or feature image.
+   * Checks one file path from the data: under assets/, of the right type, present on disk.
    *
-   * @param {*} image The `{ src, caption, alt? }` object.
+   * @param {*} path The value of `src`, `video` or `poster`.
+   * @param {string} field Its name, for messages.
+   * @param {{pattern: RegExp, types: string}} kind IMAGE_KIND or VIDEO_KIND.
+   * @param {string} where Label for messages.
+   * @param {{fileExists?: (src: string) => boolean}} options
+   * @param {string[]} problems Collected messages.
+   * @returns {boolean} True when the path is given and (as far as the caller can tell) on disk.
+   * @example checkPath('assets/updates/2026-10-18/j6-03-battery-guide.jpg', 'src', IMAGE_KIND, …);  // -> true, nothing added
+   * @example checkPath('shots/a.gif', 'src', IMAGE_KIND, …);
+   *          // -> true; adds 'src "shots/a.gif" should start with assets/' and '… should be a .jpg, .png or .webp file'
+   * @example checkPath('assets/updates/2026-10-25/trip.mp4', 'video', VIDEO_KIND, …);  // not on disk -> false, 'file not found'
+   * @example checkPath(undefined, 'poster', IMAGE_KIND, …);  // -> false, 'poster is missing'
+   */
+  function checkPath(path, field, kind, where, options, problems) {
+    if (!isFilled(path)) {
+      problems.push(`${where}: ${field} is missing`);
+      return false;
+    }
+    if (!path.startsWith('assets/')) {
+      problems.push(`${where}: ${field} "${path}" should start with assets/`);
+    }
+    if (!kind.pattern.test(path)) {
+      problems.push(`${where}: ${field} "${path}" should be a ${kind.types} file`);
+    }
+    if (options.fileExists && !options.fileExists(path)) {
+      problems.push(`${where}: file not found: ${path}`);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks the caption, the optional alt text and the optional section name of an image or video.
+   *
+   * @example checkCaptions({ caption: 'Arrived' }, 'weeks[0] gallery[3]', problems);           // clean
+   * @example checkCaptions({ caption: '', alt: ' ' }, …);         // 'caption is missing', 'alt is empty; …'
+   * @example checkCaptions({ caption: 'Arrived', group: '' }, …); // 'group is empty; …'
+   */
+  function checkCaptions(item, where, problems) {
+    if (!isFilled(item.caption)) {
+      problems.push(`${where}: caption is missing`);
+    }
+    if (item.alt !== undefined && !isFilled(item.alt)) {
+      problems.push(`${where}: alt is empty; leave it out to use the caption`);
+    }
+    if (item.group !== undefined && !isFilled(item.group)) {
+      problems.push(`${where}: group is empty; leave it out, or name the section`);
+    }
+  }
+
+  /**
+   * Checks one image: a gallery screenshot (`allowedKeys` = SHOT_KEYS, may name a `group`) or the
+   * wide feature image (IMAGE_KEYS).
+   *
+   * @param {*} image The `{ src, caption, alt?, group? }` object.
+   * @param {string[]} allowedKeys SHOT_KEYS or IMAGE_KEYS.
    * @param {string} where Label for messages, e.g. 'weeks[0] gallery[2]'.
    * @param {{fileExists?: (src: string) => boolean}} options
    * @param {string[]} problems Collected messages.
-   * @example checkImage({ src: 'assets/updates/2026-10-04/a.jpg', caption: 'Arrived' }, ...)
+   * @example checkImage({ src: 'assets/updates/2026-10-04/a.jpg', caption: 'Arrived' }, SHOT_KEYS, ...)
    *          // clean when the file exists
-   * @example checkImage({ src: 'shots/a.jpg', caption: '' }, ...)
+   * @example checkImage({ src: 'shots/a.jpg', caption: '' }, SHOT_KEYS, ...)
    *          // 'src should start with assets/', 'caption is missing'
+   * @example checkImage({ src: 'assets/…/a.jpg', caption: 'All screens', group: 'Run' }, IMAGE_KEYS, 'weeks[0] feature', ...)
+   *          // 'unknown field "group"': the wide image is not part of a section
    */
-  function checkImage(image, where, options, problems) {
+  function checkImage(image, allowedKeys, where, options, problems) {
     if (!image || typeof image !== 'object') {
       problems.push(`${where}: should be { src, caption }`);
       return;
     }
-    reportUnknownKeys(image, IMAGE_KEYS, where, problems);
-    if (!isFilled(image.src)) {
-      problems.push(`${where}: src is missing`);
+    reportUnknownKeys(image, allowedKeys, where, problems);
+    checkPath(image.src, 'src', IMAGE_KIND, where, options, problems);
+    checkCaptions(image, where, problems);
+  }
+
+  /**
+   * Checks one gallery video: the file and its poster exist, and the video is small enough.
+   *
+   * @param {object} item The `{ video, poster, caption, alt?, group? }` object.
+   * @param {string} where Label for messages, e.g. 'weeks[0] gallery[5]'.
+   * @param {{fileExists?: (src: string) => boolean, fileSize?: (src: string) => number}} options
+   * @param {string[]} problems Collected messages.
+   * @example checkVideo({ video: 'assets/updates/2026-10-25/live-trip.mp4', poster: 'assets/updates/2026-10-25/live-trip.jpg',
+   *                      caption: 'A whole trip' }, 'weeks[0] gallery[5]', options, problems);   // clean
+   * @example checkVideo({ ...item, video: 'assets/updates/2026-10-25/live-trip.mov' }, …);
+   *          // 'video "….mov" should be a .mp4 or .webm file'
+   * @example checkVideo(itemOf40MB, …);
+   *          // 'video ….mp4 is 40.0 MB; keep each video under 15 MB (shorter, or a lower resolution)'
+   * @example checkVideo({ video: 'assets/…/trip.mp4', caption: 'A trip' }, …);  // 'poster is missing'
+   */
+  function checkVideo(item, where, options, problems) {
+    reportUnknownKeys(item, VIDEO_KEYS, where, problems);
+    const videoOnDisk = checkPath(item.video, 'video', VIDEO_KIND, where, options, problems);
+    if (videoOnDisk && options.fileSize) {
+      const bytes = options.fileSize(item.video);
+      if (bytes > MAX_VIDEO_BYTES) {
+        problems.push(
+          `${where}: video ${item.video} is ${(bytes / BYTES_PER_MB).toFixed(1)} MB; keep each video under ` +
+            `${MAX_VIDEO_BYTES / BYTES_PER_MB} MB (shorter, or a lower resolution)`,
+        );
+      }
+    }
+    checkPath(item.poster, 'poster', IMAGE_KIND, where, options, problems);
+    checkCaptions(item, where, problems);
+  }
+
+  /**
+   * Checks a week's gallery as a whole: every item, no file listed twice, and each section's items
+   * kept together (a group name that comes back after another group would draw two sections).
+   *
+   * @param {object[]} gallery The week's gallery.
+   * @param {string} where e.g. 'weeks[0] (2026-10-18)'.
+   * @param {object} options fileExists / fileSize from the caller.
+   * @param {string[]} problems Collected messages.
+   * @example checkGallery(weeks[0].gallery, 'weeks[0]', options, problems);   // clean
+   * @example checkGallery([a, a], …);   // 'gallery[1]: assets/…/a.jpg is already gallery[0]'
+   * @example checkGallery([{ ...a, group: 'Sign-up' }, { ...b, group: 'Trips' }, { ...c, group: 'Sign-up' }], …);
+   *          // 'gallery[2]: group "Sign-up" was already used before "Trips"; keep a section's items together'
+   */
+  function checkGallery(gallery, where, options, problems) {
+    const firstIndexOfFile = new Map();
+    const finishedGroups = new Set();
+    let currentGroup;
+    gallery.forEach((item, index) => {
+      const at = `${where} gallery[${index}]`;
+      if (!item || typeof item !== 'object') {
+        problems.push(`${at}: should be { src, caption } or { video, poster, caption }`);
+        return;
+      }
+      if (item.video !== undefined) {
+        checkVideo(item, at, options, problems);
+      } else {
+        checkImage(item, SHOT_KEYS, at, options, problems);
+      }
+      const file = item.video !== undefined ? item.video : item.src;
+      if (isFilled(file)) {
+        if (firstIndexOfFile.has(file)) {
+          problems.push(`${at}: ${file} is already gallery[${firstIndexOfFile.get(file)}]`);
+        } else {
+          firstIndexOfFile.set(file, index);
+        }
+      }
+      if (item.group !== currentGroup) {
+        if (item.group !== undefined && finishedGroups.has(item.group)) {
+          problems.push(`${at}: group "${item.group}" was already used before "${currentGroup}"; keep a section's items together`);
+        }
+        if (currentGroup !== undefined) {
+          finishedGroups.add(currentGroup);
+        }
+        currentGroup = item.group;
+      }
+    });
+  }
+
+  /**
+   * Checks the week's optional `progress`: one to MAX_ESTIMATES figures, each with a label and a
+   * value, and the note that says how they are measured (an estimate without it would overstate).
+   *
+   * @example checkProgress({ estimates: [{ label: 'First release (pilot)', value: 'about 40–45%' }],
+   *                          note: 'Only features working for families on real phones count as done' }, 'weeks[0]', problems);  // clean
+   * @example checkProgress({ estimates: [{ label: 'Whole product', value: '' }] }, 'weeks[0]', problems);
+   *          // 'progress.estimates[0].value is missing', 'progress.note is missing; …'
+   * @example checkProgress({ estimates: [] , note: '…' }, 'weeks[0]', problems);   // 'progress.estimates needs 1 to 4 …'
+   * @example checkProgress(undefined, 'weeks[0]', problems);                        // no progress: nothing to check
+   */
+  function checkProgress(progress, where, problems) {
+    if (progress === undefined) {
+      return;
+    }
+    if (!progress || typeof progress !== 'object') {
+      problems.push(`${where}: progress should be { estimates, note }`);
+      return;
+    }
+    reportUnknownKeys(progress, PROGRESS_KEYS, `${where} progress`, problems);
+    const estimates = progress.estimates;
+    if (!Array.isArray(estimates) || estimates.length === 0 || estimates.length > MAX_ESTIMATES) {
+      problems.push(`${where}: progress.estimates needs 1 to ${MAX_ESTIMATES} { label, value } figures`);
     } else {
-      if (!image.src.startsWith('assets/')) {
-        problems.push(`${where}: src "${image.src}" should start with assets/`);
-      }
-      if (!IMAGE_FILE_PATTERN.test(image.src)) {
-        problems.push(`${where}: src "${image.src}" should be a .jpg, .png or .webp file`);
-      }
-      if (options.fileExists && !options.fileExists(image.src)) {
-        problems.push(`${where}: file not found: ${image.src}`);
-      }
+      estimates.forEach((estimate, index) => {
+        const at = `${where} progress.estimates[${index}]`;
+        if (!estimate || typeof estimate !== 'object') {
+          problems.push(`${at}: should be { label, value }`);
+          return;
+        }
+        reportUnknownKeys(estimate, ESTIMATE_KEYS, at, problems);
+        for (const field of ESTIMATE_KEYS) {
+          if (!isFilled(estimate[field])) {
+            problems.push(`${at}.${field} is missing`);
+          }
+        }
+      });
     }
-    if (!isFilled(image.caption)) {
-      problems.push(`${where}: caption is missing`);
+    if (!isFilled(progress.note)) {
+      problems.push(`${where}: progress.note is missing; say how the figures are measured`);
     }
-    if (image.alt !== undefined && !isFilled(image.alt)) {
-      problems.push(`${where}: alt is empty; leave it out to use the caption`);
+  }
+
+  /**
+   * Checks the week's optional `cover`: it must be a picture the gallery already shows (a
+   * screenshot or a video's poster), so the hero never points at a file the week does not have.
+   *
+   * @example checkCover({ cover: 'assets/updates/2026-10-18/j6-20-home-trip-in-progress.jpg', gallery }, 'weeks[0]', problems);  // clean
+   * @example checkCover({ cover: 'assets/updates/2026-10-18/missing.jpg', gallery }, 'weeks[0]', problems);
+   *          // 'weeks[0]: cover … is not one of this week's screenshots or video posters'
+   * @example checkCover({ gallery }, 'weeks[0]', problems);   // no cover: nothing to check
+   */
+  function checkCover(week, where, problems) {
+    if (week.cover === undefined) {
+      return;
+    }
+    const pictures = (Array.isArray(week.gallery) ? week.gallery : []).map((item) =>
+      item && item.video !== undefined ? item.poster : item && item.src,
+    );
+    if (!pictures.includes(week.cover)) {
+      problems.push(`${where}: cover ${week.cover} is not one of this week's screenshots or video posters`);
     }
   }
 
@@ -155,7 +367,8 @@
    *
    * @param {*} week The entry.
    * @param {string} where Label for messages, e.g. 'weeks[0] (2026-10-04)'.
-   * @param {{knownIcons: string[], areaIds: string[], phaseIds: string[], fileExists?: Function}} options
+   * @param {{knownIcons: string[], areaIds: string[], phaseIds: string[], fileExists?: Function,
+   *          fileSize?: Function}} options
    * @returns {string[]} Problems; [] when clean.
    * @example validateWeek(window.GTS_UPDATES.weeks[0], 'weeks[0]', options);  // -> []
    * @example validateWeek({ id: '2026-10-11' }, 'draft', options);
@@ -181,6 +394,7 @@
     if (week.phase !== undefined && !options.phaseIds.includes(week.phase)) {
       problems.push(`${where}: phase "${week.phase}" is not a roadmap phase id (${options.phaseIds.join(', ')})`);
     }
+    checkProgress(week.progress, where, problems);
 
     // Highlights: the cards with icons. Each needs an icon, a title, a text and known tags.
     if (!Array.isArray(week.highlights) || week.highlights.length === 0) {
@@ -218,14 +432,18 @@
       });
     }
 
-    // Gallery and feature images: real files with captions.
+    // Gallery (screenshots and videos, maybe in sections), its note and cover, and the wide image.
     if (!Array.isArray(week.gallery)) {
       problems.push(`${where}: gallery should be a list (use [] for none)`);
     } else {
-      week.gallery.forEach((image, index) => checkImage(image, `${where} gallery[${index}]`, options, problems));
+      checkGallery(week.gallery, where, options, problems);
     }
+    if (week.galleryNote !== undefined && !isFilled(week.galleryNote)) {
+      problems.push(`${where}: galleryNote is empty; leave it out when there is nothing to say`);
+    }
+    checkCover(week, where, problems);
     if (week.feature !== undefined) {
-      checkImage(week.feature, `${where} feature`, options, problems);
+      checkImage(week.feature, IMAGE_KEYS, `${where} feature`, options, problems);
     }
 
     if (!Array.isArray(week.next) || week.next.length === 0) {
@@ -367,9 +585,10 @@
    * Checks the whole of window.GTS_UPDATES.
    *
    * @param {*} data window.GTS_UPDATES.
-   * @param {{knownIcons: string[], fileExists?: (src: string) => boolean}} options
+   * @param {{knownIcons: string[], fileExists?: (src: string) => boolean, fileSize?: (src: string) => number}} options
+   *   `fileSize` gives a file's size in bytes; with it, videos over MAX_VIDEO_BYTES are reported.
    * @returns {string[]} Problems; [] when clean.
-   * @example validateUpdates(window.GTS_UPDATES, { knownIcons, fileExists });  // -> []
+   * @example validateUpdates(window.GTS_UPDATES, { knownIcons, fileExists, fileSize });  // -> []
    * @example validateUpdates({ ...data, weeks: [week, { ...week }] }, options);
    *          // -> ['weeks[1] (2026-10-04): id is used twice', ...]
    * @example validateUpdates({ ...data, weeks: [older, newer] }, options);
@@ -387,7 +606,13 @@
     const areaIds = Array.isArray(data.areas) ? data.areas.map((area) => area && area.id) : [];
     const phaseIds =
       data.roadmap && Array.isArray(data.roadmap.phases) ? data.roadmap.phases.map((phase) => phase && phase.id) : [];
-    const weekOptions = { knownIcons: options.knownIcons, fileExists: options.fileExists, areaIds, phaseIds };
+    const weekOptions = {
+      knownIcons: options.knownIcons,
+      fileExists: options.fileExists,
+      fileSize: options.fileSize,
+      areaIds,
+      phaseIds,
+    };
 
     if (!Array.isArray(data.weeks) || data.weeks.length === 0) {
       problems.push('weeks: needs at least one week');
@@ -413,7 +638,7 @@
     return problems;
   }
 
-  const api = { validateUpdates, validateWeek, findPrivateText, isRealDate, PHASE_STATUS_ORDER };
+  const api = { validateUpdates, validateWeek, findPrivateText, isRealDate, PHASE_STATUS_ORDER, MAX_VIDEO_BYTES };
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;
   } else {

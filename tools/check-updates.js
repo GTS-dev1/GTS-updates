@@ -3,8 +3,8 @@
  * Checks data/updates.js before a commit. Node only, no dependencies.
  *
  * WHAT: loads the data the way the browser does (as a script that sets window.GTS_UPDATES), then
- * runs the shared rules in js/validate.js with the icon names from js/icons.js and a real
- * file-exists check for every screenshot.
+ * runs the shared rules in js/validate.js with the icon names from js/icons.js, a real
+ * file-exists check for every screenshot, video and poster, and each video's size on disk.
  * WHEN: after pasting a new week, before `git commit` (README.md, "Post a week").
  *
  * Usage, from the repository root or anywhere:
@@ -18,6 +18,9 @@
  *     - weeks[0] (2026-10-11) highlights[1].icon: unknown icon "rocket" (see js/icons.js)
  *     - weeks[0] (2026-10-11) gallery[0]: file not found: assets/updates/2026-10-11/otp.jpg
  *   updates: 2 weeks — problems: 2                          (exit code 1)
+ * @example // a video that is too big for the page
+ *     - weeks[0] (2026-10-25) gallery[4]: video assets/updates/2026-10-25/live-trip.mp4 is 41.3 MB; keep each video under 15 MB (shorter, or a lower resolution)
+ *   updates: 4 weeks — problems: 1                          (exit code 1)
  * @example // a syntax error in the data file
  *   updates: could not load data/updates.js — Unexpected token '}'   (exit code 1)
  */
@@ -63,6 +66,17 @@ function fileExists(src) {
 }
 
 /**
+ * The size in bytes of a file named by a path from the data (the validator calls it only for
+ * files fileExists has already found).
+ *
+ * @example fileSize('assets/updates/2026-10-18/j6-03-battery-guide.jpg');  // -> 46386
+ * @example fileSize('assets/updates/2026-10-25/live-trip.mp4');           // -> 12582912   12 MB, under the limit
+ */
+function fileSize(src) {
+  return fs.statSync(path.join(ROOT, src)).size;
+}
+
+/**
  * Loads, validates and prints the summary line; sets the exit code to 1 on any problem.
  */
 function main() {
@@ -77,7 +91,7 @@ function main() {
     return;
   }
 
-  const problems = validateUpdates(data, { knownIcons, fileExists });
+  const problems = validateUpdates(data, { knownIcons, fileExists, fileSize });
   for (const problem of problems) {
     console.log(`  - ${problem}`);
   }

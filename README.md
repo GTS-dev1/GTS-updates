@@ -13,11 +13,16 @@ also opens straight from disk (`index.html`).
 
 1. **Screenshots.** Put the week's phone screenshots in `assets/updates/<yyyy-mm-dd>/` (the Sunday
    the week ends on), as JPEGs about 720 px wide, with short kebab-case names
-   (`sign-in-code.jpg`). Demo data only.
+   (`sign-in-code.jpg`). Demo data only; cover anything real (a number plate, map labels) before
+   converting. **Videos:** an `.mp4` under 15 MB per video (the checker measures it), with a poster
+   JPEG from the video beside it.
 2. **Compose.** Open `compose.html` in a browser (double-click; it works offline). Fill in the week,
-   the highlights (pick an icon and the areas), pick the screenshots and caption each one, and list
+   the highlights (pick an icon and the areas), pick the screenshots and videos, caption each one
+   (a screen that shows a problem fixed later says so), give rows a **Section** when there are many
+   (rows with the same section show under one heading; more than 12 items start closed), and list
    what comes next. The preview is drawn by the real page renderer, and the box above it lists
-   anything still missing.
+   anything still missing. `progress` (honest estimates), `galleryNote` and `cover` are written by
+   hand in `data/updates.js`; the schema at its top shows each with examples.
 3. **Copy and paste.** Press **Copy entry** and paste the result at the top of `weeks` in
    `data/updates.js`, right after `weeks: [`.
 4. **Roadmap.** If a phase finished, edit `roadmap.phases` in the same file: set it to `'done'`, and
@@ -26,7 +31,7 @@ also opens straight from disk (`index.html`).
 
    ```
    $ node tools/check-updates.js
-   updates: 2 weeks — problems: 0
+   updates: 3 weeks — problems: 0
    ```
 
 6. **Preview.** Open `index.html` and look at the new week in light and dark mode (the moon/sun
@@ -43,6 +48,11 @@ The data schema (every field, with examples) is documented at the top of `data/u
 - **Weekly updates:** newest first. The two newest weeks are open, older ones collapse to their
   header, and anything past six sits behind "Show older updates". A sticky week index (a "Jump to
   week" menu on phones) marks the week being read.
+- **Progress estimates:** a week's `progress` figures show at the top of the week, and the newest
+  week's also on the hero's card, with the line saying how they are measured.
+- **Gallery:** phone-framed screenshots and videos. Items with a `group` show in sections with a
+  heading and a count; a long gallery starts with its sections closed. Videos play in their frame
+  and download nothing until played.
 - **Permalinks:** `index.html#2026-10-04` opens that week, expanding it if needed, and highlights it;
   every week has a **Copy link** button.
 - **Area filters:** Parents, Drivers, Safety & privacy, Design, Behind the scenes (from each
@@ -59,6 +69,8 @@ The data schema (every field, with examples) is documented at the top of `data/u
 | `compose.html` | Local tool for writing a week (not linked from the page) |
 | `data/updates.js` | The content: areas, roadmap and weekly entries, with the schema |
 | `js/icons.js` | The icon sprite and the list of icon names content may use |
+| `js/escape-html.js` | The one HTML escaper the renderers share |
+| `js/gallery.js` | The week's gallery as HTML: phones, sections, videos, the hero's cover |
 | `js/render.js` | Turns the data into HTML (used by the page and the compose preview) |
 | `js/app.js` | Page behaviour: feed, collapse, permalinks, week index, filters |
 | `js/lightbox.js` | Screenshot viewer |
@@ -67,7 +79,7 @@ The data schema (every field, with examples) is documented at the top of `data/u
 | `js/entry-source.js` | Writes a week as source text for compose's "Copy entry" |
 | `js/compose.js` | The compose form |
 | `tools/check-updates.js` | `node tools/check-updates.js`: checks the data before a commit |
-| `css/` | `base` (colours, type, shared pieces), `hero`, `road`, `updates`, `lightbox`, `compose` |
+| `css/` | `base` (colours, type, shared pieces), `hero`, `road`, `updates`, `gallery`, `lightbox`, `compose` |
 | `assets/` | Favicon and screenshots |
 
 ## Add an icon or an area

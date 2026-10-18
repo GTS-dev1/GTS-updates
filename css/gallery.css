@@ -1,0 +1,250 @@
+/*
+  A week's gallery (js/gallery.js): phone screenshots and screen-recording videos in phone frames.
+  - Wide screens: a grid of phones. Phones (< 720 px): one swipeable row that snaps.
+  - Grouped galleries: one bordered section per part of the run, a <details> whose summary is the
+    heading and the count; inside a section the swipe row stays within the box.
+  - Videos play inside their phone frame with the browser's controls.
+  Also the small phone on the hero's "latest update" card (.device--mini).
+*/
+
+/* ---------- Screenshot gallery in phone frames ---------- */
+.gallery {
+  margin-top: var(--space-6);
+}
+
+.gallery__track {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: var(--space-6) var(--space-4);
+}
+
+/* Phones: one swipeable row of phones that snaps, bleeding to the screen edges. */
+@media (max-width: 719px) {
+  .gallery__track {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: 44%;
+    gap: var(--space-4);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--space-1) var(--gutter) var(--space-3);
+    scrollbar-width: thin;
+  }
+  .gallery__track > li {
+    scroll-snap-align: start;
+  }
+}
+
+.shot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.shot figcaption {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-muted);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* The phone: a dark body with an edge highlight, a side key, the screen and its camera hole.
+   Corner radii are percentages of width / height so the frame scales with the column. */
+.device {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 3.6%;
+  border: 0;
+  border-radius: 16% / 7.4%;
+  background: var(--device);
+  box-shadow:
+    inset 0 0 0 1px var(--device-edge),
+    inset 0 0 0 3px var(--device),
+    inset 0 0 0 4px rgb(255 255 255 / 0.05),
+    var(--shadow-lift);
+  cursor: zoom-in;
+  transition: transform 0.25s ease;
+}
+
+button.device:hover {
+  transform: translateY(-4px);
+}
+
+.device::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 21%;
+  width: 3px;
+  height: 9%;
+  border-radius: 0 3px 3px 0;
+  background: var(--device-edge);
+}
+
+.device__screen {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 720 / 1560;
+  border-radius: 12.5% / 5.8%;
+  background: #000;
+}
+
+.device__screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.device__screen::after {
+  content: "";
+  position: absolute;
+  top: 1.6%;
+  left: 50%;
+  width: 6%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #000;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+.device--mini {
+  width: 132px;
+  flex: none;
+  cursor: inherit;
+}
+
+/* ---------- Grouped galleries: one section per part of the run ---------- */
+.gallery__note,
+.gallery__hint {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.gallery__note + .gallery__hint {
+  margin-top: var(--space-1);
+}
+
+/* minmax(0, 1fr) and min-width: 0: an open section's swipe row is as wide as all its phones; without
+   these the grid column grows to fit it and the whole page scrolls sideways on a phone. */
+.gallery--grouped {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.gallery__group {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--panel);
+}
+
+.gallery__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  border-radius: var(--radius-m);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.35;
+  cursor: pointer;
+  list-style: none;
+}
+
+.gallery__heading::-webkit-details-marker {
+  display: none;
+}
+
+.gallery__heading:hover .gallery__chevron {
+  color: var(--ink);
+}
+
+.gallery__heading-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.gallery__count {
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--bg-sunken);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.gallery__chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--ink-soft);
+  transition: transform 0.2s ease;
+}
+
+.gallery__group[open] .gallery__chevron {
+  transform: rotate(180deg);
+}
+
+.gallery__group > .gallery__track {
+  padding: var(--space-2) 16px var(--space-5);
+}
+
+/* Phones: the section's swipe row scrolls inside its box instead of bleeding to the screen edge. */
+@media (max-width: 719px) {
+  .gallery__group > .gallery__track {
+    margin-inline: 0;
+    padding: var(--space-1) 16px var(--space-4);
+    scroll-padding-inline: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery__chevron {
+    transition: none;
+  }
+}
+
+/* ---------- Videos in a phone frame ---------- */
+.device--video {
+  cursor: auto;
+}
+
+.device__screen video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.shot__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 4px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--live-soft);
+  color: var(--live-ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.7;
+  vertical-align: 1px;
+}
+
+.shot__kind .icon {
+  width: 11px;
+  height: 11px;
+}

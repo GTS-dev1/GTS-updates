@@ -11,6 +11,8 @@
  * nothing (when storage is available).
  * Screenshots: picking files from assets/updates/<date>/ fills their names and shows them in the
  * preview at once from memory, before they are committed; the entry stores only the path.
+ * A row whose file is a video (.mp4, .webm) becomes a video item and uses the row's poster image.
+ * A row's optional "Section" puts it under that heading (the gallery's `group`).
  */
 (function composeUpdate() {
   'use strict';
@@ -26,6 +28,8 @@
   /** Sunday = 0 in Date.getDay(); weeks end on a Sunday. */
   const SUNDAY = 0;
   const DAYS_PER_WEEK = 7;
+  /** A row's file is a video when its name ends like this (the formats js/validate.js accepts). */
+  const VIDEO_FILE_PATTERN = /\.(mp4|webm)$/i;
 
   const { render, icons, validate, entrySource, lightbox } = window.GTS;
   const data = window.GTS_UPDATES || { areas: [], roadmap: { phases: [] }, weeks: [] };
@@ -86,9 +90,13 @@
     return { key: uniqueKey(), icon: '', title: '', text: '', tags: [] };
   }
 
-  /** A screenshot row: `file` is the name in the week's folder, e.g. 'sign-in-code.jpg'. */
+  /**
+   * A gallery row: `file` is the name in the week's folder, e.g. 'sign-in-code.jpg' or
+   * 'live-trip.mp4'; `group` the optional section heading; `poster` the picture a video shows
+   * before it plays (ignored for screenshots).
+   */
   function blankShot(file) {
-    return { key: uniqueKey(), file: file || '', caption: '', alt: '' };
+    return { key: uniqueKey(), file: file || '', caption: '', alt: '', group: '', poster: '' };
   }
 
   /**
@@ -166,14 +174,34 @@
    * empty are left out; required ones stay (even empty) so the checks can point at them.
    *
    * @example buildEntry().gallery;  // -> [{ src: 'assets/updates/2026-10-11/otp.jpg', caption: 'Typing the code' }]
+   * @example buildEntry().gallery;  // a row 'live-trip.mp4', poster 'live-trip.jpg', section 'Live trips'
+   *          // -> [{ video: 'assets/updates/2026-10-25/live-trip.mp4', poster: 'assets/updates/2026-10-25/live-trip.jpg',
+   *          //       caption: 'A whole trip', group: 'Live trips' }]
    * @example buildEntry().phase;    // phase select set to '(none)' -> undefined, so the field is left out
    * @example buildEntry().next;     // textarea 'Driver setup\n\nGTS review' -> ['Driver setup', 'GTS review']
    */
   function buildEntry() {
+    // WHY `|| ''`: drafts saved before rows had a section or a poster lack those fields.
     const image = (row) => {
       const result = { src: screenshotPath(row.file, state.id), caption: row.caption.trim() };
       if (row.alt.trim()) {
         result.alt = row.alt.trim();
+      }
+      return result;
+    };
+    const galleryItem = (row) => {
+      const result = VIDEO_FILE_PATTERN.test(row.file.trim())
+        ? {
+            video: screenshotPath(row.file, state.id),
+            poster: screenshotPath(row.poster || '', state.id),
+            caption: row.caption.trim(),
+          }
+        : image(row);
+      if (result.video !== undefined && row.alt.trim()) {
+        result.alt = row.alt.trim();
+      }
+      if ((row.group || '').trim()) {
+        result.group = row.group.trim();
       }
       return result;
     };
@@ -189,7 +217,7 @@
         text: item.text.trim().replace(/\s+/g, ' '),
         tags: areaIds.filter((id) => item.tags.includes(id)),
       })),
-      gallery: state.gallery.map(image),
+      gallery: state.gallery.map(galleryItem),
       feature: state.feature.file.trim() ? image(state.feature) : undefined,
       next: state.next.split('\n').map((line) => line.trim()).filter(Boolean),
     };
@@ -228,9 +256,9 @@
   /** Redraws the preview, the checks and the source text from `state`, and saves the draft. */
   function refresh() {
     const entry = buildEntry();
-    const resolveSrc = (src) => previewUrls.get(src.split('/').pop()) || src;
+    const resolveSrc = (src) => previewUrls.get(String(src).split('/').pop()) || src;
     preview.innerHTML =
-      `<div class="preview__latest">${render.renderLatest({ ...entry, gallery: entry.gallery.map((shot) => ({ ...shot, src: resolveSrc(shot.src) })) })}</div>` +
+      `<div class="preview__latest">${render.renderLatest(entry, { resolveSrc })}</div>` +
       `<div class="feed">${render.renderWeek(entry, { ...lookups, number: (data.weeks || []).length + 1, resolveSrc })}</div>`;
 
     const problems = weekProblems(entry);
@@ -438,12 +466,21 @@
       </fieldset>`;
   }
 
-  /** One screenshot row: file name, caption, optional alt text. */
+  /**
+   * One gallery row: file name, caption, optional section, optional alt text, and the poster for
+   * a video. The thumbnail shows the screenshot, or the poster of a video.
+   *
+   * @example shotFieldset({ file: 'j6-03-battery-guide.jpg', caption: 'Keep GTS running', group: 'Starting a trip', … }, 2);
+   *          // 'Screenshot or video 3' with the battery guide as its thumbnail
+   * @example shotFieldset({ file: 'live-trip.mp4', poster: 'live-trip.jpg', … }, 0);
+   *          // thumbnail = the poster
+   */
   function shotFieldset(row, index) {
-    const thumb = previewUrls.get(row.file) || (row.file ? screenshotPath(row.file, state.id) : '');
+    const pictureFile = VIDEO_FILE_PATTERN.test(row.file) ? row.poster || '' : row.file;
+    const thumb = previewUrls.get(pictureFile) || (pictureFile ? screenshotPath(pictureFile, state.id) : '');
     return `
       <fieldset class="row row--shot">
-        <legend>Screenshot ${index + 1}</legend>
+        <legend>Screenshot or video ${index + 1}</legend>
         ${rowTools('gallery', index, state.gallery.length, 'screenshot')}
         <div class="shot-row">
           <span class="shot-row__thumb">${thumb ? `<img src="${esc(thumb)}" alt="" />` : icons.svg('image')}</span>
@@ -452,8 +489,12 @@
               <input type="text" data-bind="gallery.${index}.file" value="${esc(row.file)}" placeholder="sign-in-code.jpg" /></label>
             <label class="field"><span class="field__label">Caption</span>
               <input type="text" data-bind="gallery.${index}.caption" value="${esc(row.caption)}" placeholder="Typing the one-time code" /></label>
+            <label class="field"><span class="field__label">Section <small>optional; rows with the same section show under one heading</small></span>
+              <input type="text" data-bind="gallery.${index}.group" value="${esc(row.group || '')}" placeholder="Starting a trip" /></label>
             <label class="field"><span class="field__label">Alt text <small>optional; the caption is used without it</small></span>
               <input type="text" data-bind="gallery.${index}.alt" value="${esc(row.alt)}" /></label>
+            <label class="field"><span class="field__label">Poster image <small>videos only: the picture shown before it plays</small></span>
+              <input type="text" data-bind="gallery.${index}.poster" value="${esc(row.poster || '')}" placeholder="live-trip.jpg" /></label>
           </div>
         </div>
       </fieldset>`;
@@ -490,9 +531,10 @@
       <section class="panel">
         <h2 class="panel__title">3 · Screenshots</h2>
         <p class="panel__hint">Put the JPEGs in <code data-folder>${esc(ASSETS_ROOT + state.id)}/</code> first, then pick them here
-          (they show in the preview straight away). Phone screenshots, about 720 px wide.</p>
-        <label class="button button--file">${icons.svg('image')}<span>Pick screenshots…</span>
-          <input type="file" accept="image/jpeg,image/png,image/webp" multiple class="visually-hidden" /></label>
+          (they show in the preview straight away). Phone screenshots, about 720 px wide. Videos: .mp4 under 15 MB,
+          with a poster JPEG beside them.</p>
+        <label class="button button--file">${icons.svg('image')}<span>Pick screenshots or videos…</span>
+          <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple class="visually-hidden" /></label>
         ${state.gallery.map(shotFieldset).join('')}
         <button type="button" class="button button--quiet" data-action="add-shot">${icons.svg('plus')}<span>Add a row by hand</span></button>
         <fieldset class="row">

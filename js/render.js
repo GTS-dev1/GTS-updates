@@ -10,6 +10,10 @@
   'use strict';
 
   const icons = root.GTS.icons;
+  /** The shared escaper (js/escape-html.js); also offered below as GTS.render.escapeHtml. */
+  const escapeHtml = root.GTS.escapeHtml;
+  /** Screenshots, videos and their sections (js/gallery.js). */
+  const gallery = root.GTS.gallery;
 
   /** Short month names for the week index, e.g. '4 Oct'. Index = month number - 1. */
   const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -27,27 +31,6 @@
     planned: 'Planned',
     later: 'Later',
   };
-
-  /**
-   * Escapes text for safe insertion into HTML text and attribute values.
-   *
-   * @param {*} text Anything; null and undefined become ''.
-   * @returns {string}
-   * @example escapeHtml('The van "docks" <home>');  // -> 'The van &quot;docks&quot; &lt;home&gt;'
-   * @example escapeHtml("Parent's view");           // -> 'Parent&#39;s view'
-   * @example escapeHtml(undefined);                 // -> ''
-   */
-  function escapeHtml(text) {
-    if (text === undefined || text === null) {
-      return '';
-    }
-    return String(text)
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#39;');
-  }
 
   /**
    * A week id as a short date for the week index.
@@ -108,16 +91,50 @@
   }
 
   /**
+   * A week's honest progress estimates as figures with labels, and the line saying how they are
+   * measured. Drawn at the top of the week body and, for the newest week, on the hero's card.
+   *
+   * @param {{estimates: {label: string, value: string}[], note: string}|undefined} progress
+   * @returns {string} '' when the week has no estimates.
+   * @example renderEstimates(window.GTS_UPDATES.weeks[0].progress);
+   *          // <div class="estimates"> 'about 40–45%' First release (pilot) · 'about 25%' Whole product,
+   *          // then 'Only features working for families on real phones count as done'
+   * @example renderEstimates({ estimates: [{ label: 'Whole product', value: 'about 30%' }], note: '…' });
+   *          // one figure and the note
+   * @example renderEstimates(undefined);  // -> ''   older weeks have no estimates
+   */
+  function renderEstimates(progress) {
+    if (!progress || !Array.isArray(progress.estimates) || progress.estimates.length === 0) {
+      return '';
+    }
+    const figures = progress.estimates
+      .map(
+        (estimate) => `
+          <div class="estimates__item">
+            <dt>${escapeHtml(estimate.label)}</dt>
+            <dd>${escapeHtml(estimate.value)}</dd>
+          </div>`,
+      )
+      .join('');
+    const note = progress.note ? `<p class="estimates__note">${escapeHtml(progress.note)}</p>` : '';
+    return `<div class="estimates"><dl class="estimates__list">${figures}</dl>${note}</div>`;
+  }
+
+  /**
    * The hero's at-a-glance card: stops done out of the road's total, a segmented bar (one segment
-   * per stop), what is being built now and what comes next.
+   * per stop), the newest week's progress estimates (when it has them), what is being built now
+   * and what comes next.
    *
    * @param {{phases: object[]}} roadmap
+   * @param {object} [progress] The newest week's `progress`.
    * @returns {string}
+   * @example renderGlance(window.GTS_UPDATES.roadmap, window.GTS_UPDATES.weeks[0].progress);
+   *          // '5 of 10 stops done', 10 segments (5 done, 1 now, 4 to go), 'about 40–45%' and 'about 25%'
+   *          // with their note, 'Building now: Live trips', 'Next: Alerts'
    * @example renderGlance(window.GTS_UPDATES.roadmap);
-   *          // '2 of 10 stops to the pilot', 10 segments (2 done, 1 now, 7 to go),
-   *          // 'Building now: Driver setup', 'Next: GTS review'
+   *          // the same card without the estimates
    */
-  function renderGlance(roadmap) {
+  function renderGlance(roadmap, progress) {
     const summary = summariseRoadmap(roadmap);
     const segments = summary.road
       .map((phase) => `<span class="glance__segment" data-status="${escapeHtml(phase.status)}" title="${escapeHtml(phase.label)}"></span>`)
@@ -133,6 +150,7 @@
       <p class="glance__eyebrow">Progress to the pilot</p>
       <p class="glance__count"><strong>${summary.doneCount}</strong><span>of ${summary.road.length} stops done</span></p>
       <div class="glance__bar" role="img" aria-label="${summary.doneCount} of ${summary.road.length} stops done">${segments}</div>
+      ${renderEstimates(progress)}
       <dl class="glance__rows">
         ${row('Building now', summary.current, 'now')}
         ${row('Next', summary.next, 'next')}
@@ -144,21 +162,26 @@
   }
 
   /**
-   * The hero's "latest update" card: date, title, summary and the first screenshot in a small
-   * phone frame. Links to the week's permalink.
+   * The hero's "latest update" card: date, title, summary and the week's cover picture in a small
+   * phone frame (its `cover`, else the first screenshot, else the first video's poster). Links to
+   * the week's permalink.
    *
    * @param {object} week The newest week.
+   * @param {{resolveSrc?: (src: string) => string}} [options] compose.html passes `resolveSrc` to
+   *   show a picked file before it is in the assets folder.
    * @returns {string}
    * @example renderLatest(window.GTS_UPDATES.weeks[0]);
-   *          // <a class="latest" href="#2026-10-04"> 'Latest · Week ending 4 October 2026',
-   *          // 'The app runs on a real phone', a phone with trip-on-the-way-dark.jpg
-   * @example renderLatest({ ...week, gallery: [] });  // the same card without the phone
+   *          // <a class="latest" href="#2026-10-18"> 'Latest · Week ending 18 October 2026',
+   *          // 'Live trips, parents joining…', a phone with its cover j6-20-home-trip-in-progress.jpg
+   * @example renderLatest(weekWithoutCover);  // the phone shows the first screenshot instead
+   * @example renderLatest({ ...week, gallery: [], cover: undefined });  // the same card without the phone
    */
-  function renderLatest(week) {
-    const cover = week.gallery && week.gallery[0];
+  function renderLatest(week, options = {}) {
+    const resolveSrc = options.resolveSrc || ((src) => src);
+    const cover = gallery.coverSrc(week);
     const phone = cover
       ? `<span class="latest__phone device device--mini" aria-hidden="true"><span class="device__screen">
-           <img src="${escapeHtml(cover.src)}" alt="" decoding="async" /></span></span>`
+           <img src="${escapeHtml(resolveSrc(cover))}" alt="" decoding="async" /></span></span>`
       : '';
     return `
       <a class="latest" href="#${escapeHtml(week.id)}">
@@ -223,32 +246,9 @@
   }
 
   /**
-   * One screenshot in a phone frame, as a button that opens the viewer.
-   *
-   * @param {{src: string, caption: string, alt?: string}} shot
-   * @param {string} src The address to load (compose.html swaps in a local preview).
-   * @returns {string}
-   * @example renderShot({ src: 'a.jpg', caption: 'Arrived' }, 'a.jpg');
-   *          // <figure class="shot"><button class="device" data-shot data-src="a.jpg" ...><img alt="Arrived">
-   * @example renderShot({ src: 'a.jpg', caption: 'Arrived', alt: 'Van icon inside the home circle' }, 'a.jpg');
-   *          // the image's alt says the longer text; the caption stays 'Arrived'
-   */
-  function renderShot(shot, src) {
-    const alt = shot.alt || shot.caption;
-    return `
-      <figure class="shot">
-        <button type="button" class="device" data-shot data-src="${escapeHtml(src)}" data-caption="${escapeHtml(shot.caption)}"
-                data-alt="${escapeHtml(alt)}" aria-label="View larger: ${escapeHtml(shot.caption)}">
-          <span class="device__screen"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" /></span>
-        </button>
-        <figcaption>${escapeHtml(shot.caption)}</figcaption>
-      </figure>`;
-  }
-
-  /**
    * One week as an <article>: header (number, date, phase, title, summary, link), then the body
-   * (highlights, phone gallery, feature image, coming next). A collapsed week hides its body behind
-   * a "Show the full week" button; js/app.js wires that button.
+   * (progress estimates, highlights, the gallery from js/gallery.js, feature image, coming next). A collapsed week
+   * hides its body behind a "Show the full week" button; js/app.js wires that button.
    *
    * @param {object} week An entry from data/updates.js.
    * @param {{number: number, areasById: object, phasesById: object, collapsed?: boolean,
@@ -261,6 +261,8 @@
    *          // 'Foundation', 6 highlight cards, 6 phones, the wide sky image, 3 'Coming next' items
    * @example renderWeek(weeks[3], { number: 2, areasById, phasesById, collapsed: true });
    *          // the same header; body hidden; button 'Show the full week · 6 highlights · 4 screenshots'
+   * @example renderWeek(weekWithVideos, { number: 4, areasById, phasesById, collapsed: true });
+   *          // button 'Show the full week · 9 highlights · 82 screenshots · 2 videos'
    * @example renderWeek({ ...week, gallery: [], feature: undefined }, context);
    *          // no gallery block at all, not an empty one
    */
@@ -269,7 +271,6 @@
     const id = escapeHtml(week.id);
     const phase = week.phase && context.phasesById[week.phase];
     const highlights = week.highlights || [];
-    const gallery = week.gallery || [];
 
     const highlightCards = highlights
       .map((item) => {
@@ -288,11 +289,7 @@
       })
       .join('');
 
-    const galleryBlock = gallery.length
-      ? `<div class="gallery"><ul class="gallery__track" aria-label="Screenshots">${gallery
-          .map((shot) => `<li>${renderShot(shot, resolveSrc(shot.src))}</li>`)
-          .join('')}</ul></div>`
-      : '';
+    const galleryBlock = gallery.renderGallery(week, { resolveSrc });
 
     const feature = week.feature
       ? `<figure class="feature">
@@ -313,10 +310,10 @@
          </aside>`
       : '';
 
-    const shotCount = gallery.length + (week.feature ? 1 : 0);
+    const mediaLabel = gallery.mediaCountLabel(week.gallery, week.feature);
     const expandLabel =
       `Show the full week · ${highlights.length} highlight${highlights.length === 1 ? '' : 's'}` +
-      (shotCount ? ` · ${shotCount} screenshot${shotCount === 1 ? '' : 's'}` : '');
+      (mediaLabel ? ` · ${mediaLabel}` : '');
 
     return `
       <article class="week${context.collapsed ? ' is-collapsed' : ''}" id="${id}" data-week aria-labelledby="title-${id}">
@@ -331,6 +328,7 @@
           <button type="button" class="week__copy" data-copy-link="${id}">${icons.svg('link')}<span>Copy link</span></button>
         </header>
         <div class="week__body" id="body-${id}"${context.collapsed ? ' hidden' : ''}>
+          ${renderEstimates(week.progress)}
           ${highlightCards ? `<ul class="highlights">${highlightCards}</ul>` : ''}
           <p class="week__filtered" hidden></p>
           ${galleryBlock}
@@ -368,6 +366,7 @@
     weekLabel,
     summariseRoadmap,
     renderGlance,
+    renderEstimates,
     renderLatest,
     renderRoadmap,
     renderWeek,

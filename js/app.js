@@ -43,7 +43,8 @@
   const feed = document.getElementById('feed');
 
   document.getElementById('latest').innerHTML = render.renderLatest(data.weeks[0]);
-  document.getElementById('glance').innerHTML = render.renderGlance(data.roadmap);
+  // The card shows the newest week's progress estimates, so the hero and the latest update agree.
+  document.getElementById('glance').innerHTML = render.renderGlance(data.roadmap, data.weeks[0].progress);
   document.getElementById('road').innerHTML = render.renderRoadmap(data.roadmap);
   renderFeed();
   renderWeekIndex();

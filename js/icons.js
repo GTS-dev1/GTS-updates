@@ -79,6 +79,8 @@
     copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
     image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m20.5 16-5-5-9 8.5"/>',
     expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    /** The 'Video' tag under a video in the gallery (js/gallery.js); a solid triangle. */
+    play: '<path d="M8 5.5v13l10-6.5z" fill="currentColor"/>',
   };
 
   /** Every icon, content first; the sprite holds all of them. */
