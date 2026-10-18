@@ -166,7 +166,8 @@ window.GTS_UPDATES = {
         'adds their child, the driver starts a trip, and the parent follows the van with an alert at ' +
         'each step, after GTS has checked the vehicle. For now everything runs against a test backend ' +
         "on a laptop, so GTS is not yet usable by families. This week's run on a virtual Android phone " +
-        'found 8 problems, and all 8 were fixed the same day.',
+        'found 7 problems: 6 were fixed the same day, and one — GPS pausing when the driver swipes ' +
+        'GTS away — is being fixed next.',
       phase: 'live-trips',
       progress: {
         estimates: [
@@ -245,8 +246,8 @@ window.GTS_UPDATES = {
           title: 'Tested on a virtual phone',
           text:
             'Every screen was tapped through on a virtual Android phone against a test backend on a ' +
-            'laptop. Both trip directions fired every alert once and in order; the 8 problems the run ' +
-            'found were fixed the same day. Not yet tried by families or on real roads.',
+            'laptop. Both trip directions fired every alert once and in order. The run found 7 ' +
+            'problems: 6 were fixed the same day, one is next. Not yet tried by families or on real roads.',
           tags: ['tech'],
         },
       ],
