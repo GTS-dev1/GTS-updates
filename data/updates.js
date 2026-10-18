@@ -170,7 +170,7 @@ window.GTS_UPDATES = {
         'each step, after GTS has checked the vehicle. For now everything runs against a test backend ' +
         "on a laptop, so GTS is not yet usable by families. This week's run on a virtual Android phone " +
         'found 7 problems: 6 were fixed the same day, and one — GPS pausing when the driver swipes ' +
-        'GTS away — is being fixed next. A 14-minute video now shows the whole flow on two test phones.',
+        'GTS away — is being fixed next. A 13-minute video now shows the whole flow on two test phones.',
       phase: 'live-trips',
       progress: {
         estimates: [
@@ -261,7 +261,7 @@ window.GTS_UPDATES = {
           video: 'assets/updates/2026-10-18/full-demo.mp4',
           poster: 'assets/updates/2026-10-18/full-demo.jpg',
           download: 'assets/updates/2026-10-18/full-demo-hd.mp4',
-          caption: 'The whole of GTS, start to finish, on two test phones (14 min)',
+          caption: 'The whole of GTS, start to finish, on two test phones (13 min)',
           alt: 'Demo video: a driver signs up and sends his papers, GTS approves him, a parent joins and follows the trip home on a map with alerts',
           group: 'Full demo: start to finish',
         },
@@ -350,8 +350,8 @@ window.GTS_UPDATES = {
       ],
       galleryNote:
         'First the full demo on two virtual phones — 0:07 the driver signs up · 1:23 vehicle and papers · ' +
-        '4:03 the school · 4:38 GTS approves the driver · 7:26 the invite code · 7:53 a parent joins · ' +
-        "9:18 the trip home, live · 12:54 Today's alerts and Hindi — then every screen from the first run, " +
+        '4:03 the school · 4:38 GTS staff approve the driver · 6:38 the invite code · 7:04 a parent joins · ' +
+        "8:29 the trip home, live · 12:05 Today's alerts and Hindi — then every screen from the first run, " +
         'in order. Number plates and map details are hidden; names and phone numbers are made-up test data.',
       cover: 'assets/updates/2026-10-18/j6-20-home-trip-in-progress.jpg',
       next: [
