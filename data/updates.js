@@ -107,11 +107,11 @@ window.GTS_UPDATES = {
       { id: 'foundation', label: 'Foundation', detail: 'App skeleton, journey alerts, design system', icon: 'phone', status: 'done' },
       { id: 'sign-in', label: 'Sign-in', detail: 'Phone number and one-time code, consent, roles', icon: 'key', status: 'done' },
       { id: 'driver-setup', label: 'Driver setup', detail: 'Vehicle, papers, schools, invite code', icon: 'van', status: 'done' },
-      { id: 'gts-review', label: 'GTS review', detail: 'GTS staff check papers, approve or reject', icon: 'shield', status: 'now' },
-      { id: 'parent-joins', label: 'Parent joins', detail: 'Invite code, child, pickup point', icon: 'users', status: 'next' },
-      { id: 'live-trips', label: 'Live trips', detail: 'Real GPS and a live map for parents', icon: 'map-pin', status: 'planned' },
-      { id: 'alerts', label: 'Alerts', detail: 'Near home, reached and left school, delays, SOS', icon: 'bell', status: 'planned' },
-      { id: 'settings-privacy', label: 'Settings & privacy', detail: 'Account deletion, grievance contact', icon: 'settings', status: 'planned' },
+      { id: 'gts-review', label: 'GTS review', detail: 'GTS staff check papers, approve or reject', icon: 'shield', status: 'done' },
+      { id: 'parent-joins', label: 'Parent joins', detail: 'Invite code, child, pickup point', icon: 'users', status: 'done' },
+      { id: 'live-trips', label: 'Live trips', detail: 'Real GPS and a live map for parents', icon: 'map-pin', status: 'done' },
+      { id: 'alerts', label: 'Alerts', detail: 'Near home, reached and left school, delays, SOS', icon: 'bell', status: 'now' },
+      { id: 'settings-privacy', label: 'Settings & privacy', detail: 'Account deletion, grievance contact', icon: 'settings', status: 'next' },
       { id: 'phone-testing', label: 'Testing on phones', detail: 'Many Android phones, real roads', icon: 'check', status: 'planned' },
       { id: 'pilot', label: 'Pilot', detail: 'Real families, real school runs', icon: 'school', status: 'planned' },
       { id: 'find-driver', label: 'Find a driver', detail: 'Parents look up drivers by school and area', icon: 'search', status: 'later' },
@@ -126,6 +126,108 @@ window.GTS_UPDATES = {
 
   /** One entry per week, newest first. Paste a new week ABOVE the first one. */
   weeks: [
+    {
+      id: '2026-10-18',
+      dateLabel: 'Week ending 18 October 2026',
+      title: 'Live trips, parents joining and a stronger vehicle check',
+      summary:
+        'GTS now runs a whole school trip: a parent joins their driver with the invite code and ' +
+        'adds their child, the driver starts a trip, and the parent follows the van with an alert ' +
+        'at each step. Before any of that, GTS checks every vehicle: seven fresh photos ' +
+        'carrying a one-time code, and the number plate on the government record. Everything was ' +
+        'run end to end on a virtual Android phone, and what the run found was fixed the same day.',
+      phase: 'live-trips',
+      highlights: [
+        {
+          icon: 'van',
+          title: 'Start a trip',
+          text:
+            'The way is preset by the time of day, and the driver is warned when no parent will see ' +
+            'the trip. A short guide first makes sure the phone does not pause GTS to save battery.',
+          tags: ['drivers'],
+        },
+        {
+          icon: 'map-pin',
+          title: 'Follow the van live',
+          text:
+            "Parents see \"On the way\" on their child's card, then the van on a map with \"Updated " +
+            '20 seconds ago" (red after 3 minutes), the distance from the pickup, every step so far ' +
+            'and Call driver.',
+          tags: ['parents'],
+        },
+        {
+          icon: 'bell',
+          title: 'An alert at every step',
+          text:
+            'Near home, reached school, left school, dropped at home: a banner in the app and a phone ' +
+            'notification, only ever about your own child on a shared van.',
+          tags: ['parents', 'safety'],
+        },
+        {
+          icon: 'clock',
+          title: 'Daily trip reminders',
+          text:
+            'Drivers can set a morning and an afternoon reminder in Settings; tapping it opens Start a trip.',
+          tags: ['drivers'],
+        },
+        {
+          icon: 'users',
+          title: 'Parents join',
+          text:
+            "A parent types the driver's invite code, picks the school and adds their child: a first " +
+            'name, the pickup point and a short declaration. The driver sees them under My children.',
+          tags: ['parents', 'drivers'],
+        },
+        {
+          icon: 'camera',
+          title: 'Coded vehicle photos',
+          text:
+            'Front, back, both sides, the seats, the chassis number and the driver with the vehicle, ' +
+            'taken with the camera only. A one-time code on the dashboard proves the photos are new.',
+          tags: ['drivers', 'safety'],
+        },
+        {
+          icon: 'shield',
+          title: 'Government record check',
+          text:
+            'Before approving, GTS looks the number plate up on the government vehicle record and ' +
+            'ticks five checks. The app refuses an approval without them.',
+          tags: ['safety', 'drivers'],
+        },
+        {
+          icon: 'check',
+          title: 'GTS review screens',
+          text:
+            'GTS staff see the vehicle, its photos and the papers, then approve with the dates from ' +
+            'the papers or reject with a reason. The driver fixes what the reason names and sends again.',
+          tags: ['drivers', 'safety'],
+        },
+        {
+          icon: 'phone',
+          title: 'Tested end to end',
+          text:
+            'Run screen by screen on a virtual Android phone against the real backend: both trip ' +
+            'directions fired every alert once and in order, and the bugs it found were fixed that day.',
+          tags: ['tech'],
+        },
+      ],
+      gallery: [
+        { src: 'assets/updates/2026-10-18/start-a-trip.jpg', caption: 'Start a trip: the way is preset by the time of day' },
+        { src: 'assets/updates/2026-10-18/start-a-trip-hindi.jpg', caption: 'The same screen in Hindi' },
+        { src: 'assets/updates/2026-10-18/keep-gts-running.jpg', caption: 'A short guide so the phone does not pause GTS mid-trip' },
+        { src: 'assets/updates/2026-10-18/driver-trip-events.jpg', caption: "The driver's running trip, each step as it happens" },
+        { src: 'assets/updates/2026-10-18/todays-alerts.jpg', caption: "The parent's alerts for today, newest first" },
+        { src: 'assets/updates/2026-10-18/parent-trip-timeline.jpg', caption: 'After the trip: every step in order, and Call driver' },
+        { src: 'assets/updates/2026-10-18/add-your-child.jpg', caption: 'A parent adds their child: first name, pickup point, declaration' },
+        { src: 'assets/updates/2026-10-18/vehicle-photo-code.jpg', caption: 'Seven vehicle photos, with the one-time code on the dashboard' },
+        { src: 'assets/updates/2026-10-18/approve-government-record.jpg', caption: 'GTS approves only after checking the government record' },
+      ],
+      next: [
+        "A live run with a parent's real phone watching while the van drives",
+        'Keeping GPS running when the driver swipes GTS away',
+        'Real push notifications when GTS is closed',
+      ],
+    },
     {
       id: '2026-10-11',
       dateLabel: 'Week ending 11 October 2026',
