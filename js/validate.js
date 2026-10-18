@@ -35,7 +35,7 @@
   /** A screenshot in the gallery: an image that may also name its section. */
   const SHOT_KEYS = ['src', 'caption', 'alt', 'group'];
   /** A screen-recording video in the gallery. */
-  const VIDEO_KEYS = ['video', 'poster', 'caption', 'alt', 'group'];
+  const VIDEO_KEYS = ['video', 'poster', 'caption', 'alt', 'group', 'download'];
   const PHASE_KEYS = ['id', 'label', 'detail', 'icon', 'status'];
 
   /** More highlights than this stop reading as highlights; split the week's story instead. */
@@ -55,6 +55,12 @@
    * warns on files over 50 MB.
    */
   const MAX_VIDEO_BYTES = 15 * 1024 * 1024;
+  /**
+   * The largest full-resolution file a video may offer as a download link: 50 MB. WHY: it is never
+   * fetched unless someone taps the link, so it may be bigger than an inline video, but GitHub warns
+   * on files over 50 MB (and refuses them over 100 MB).
+   */
+  const MAX_DOWNLOAD_BYTES = 50 * 1024 * 1024;
   const BYTES_PER_MB = 1024 * 1024;
 
   /**
@@ -220,9 +226,10 @@
   }
 
   /**
-   * Checks one gallery video: the file and its poster exist, and the video is small enough.
+   * Checks one gallery video: the file and its poster exist, and the video is small enough; an
+   * optional full-resolution `download` must exist and stay under 50 MB.
    *
-   * @param {object} item The `{ video, poster, caption, alt?, group? }` object.
+   * @param {object} item The `{ video, poster, caption, alt?, group?, download? }` object.
    * @param {string} where Label for messages, e.g. 'weeks[0] gallery[5]'.
    * @param {{fileExists?: (src: string) => boolean, fileSize?: (src: string) => number}} options
    * @param {string[]} problems Collected messages.
@@ -233,6 +240,9 @@
    * @example checkVideo(itemOf40MB, …);
    *          // 'video ….mp4 is 40.0 MB; keep each video under 15 MB (shorter, or a lower resolution)'
    * @example checkVideo({ video: 'assets/…/trip.mp4', caption: 'A trip' }, …);  // 'poster is missing'
+   * @example checkVideo({ ...item, download: 'assets/updates/2026-10-18/full-demo-hd.mp4' }, …);
+   *          // clean when the file exists and is at most 50 MB; a 60 MB one:
+   *          // 'download assets/…/full-demo-hd.mp4 is 60.0 MB; keep it under 50 MB'
    */
   function checkVideo(item, where, options, problems) {
     reportUnknownKeys(item, VIDEO_KEYS, where, problems);
@@ -247,6 +257,15 @@
       }
     }
     checkPath(item.poster, 'poster', IMAGE_KIND, where, options, problems);
+    if (item.download !== undefined) {
+      const downloadOnDisk = checkPath(item.download, 'download', VIDEO_KIND, where, options, problems);
+      if (downloadOnDisk && options.fileSize && options.fileSize(item.download) > MAX_DOWNLOAD_BYTES) {
+        problems.push(
+          `${where}: download ${item.download} is ${(options.fileSize(item.download) / BYTES_PER_MB).toFixed(1)} MB; ` +
+            `keep it under ${MAX_DOWNLOAD_BYTES / BYTES_PER_MB} MB`,
+        );
+      }
+    }
     checkCaptions(item, where, problems);
   }
 

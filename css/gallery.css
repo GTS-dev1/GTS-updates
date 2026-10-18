@@ -248,3 +248,13 @@ button.device:hover {
   width: 11px;
   height: 11px;
 }
+
+/* A video's "Full resolution" link: quiet next to the caption, still a clear tap target. */
+.shot__download {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 2px 0;
+  color: var(--live-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}

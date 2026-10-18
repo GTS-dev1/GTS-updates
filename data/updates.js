@@ -59,13 +59,16 @@
  *              the gallery is one grid, as before; a grouped gallery of more than 12 items starts
  *              with its sections closed.
  *              e.g. 'Sign-up and privacy'   'Starting a trip: battery and location'
- *              A VIDEO is { video, poster, caption, alt?, group? }:
+ *              A VIDEO is { video, poster, caption, alt?, group?, download? }:
  *     video    string, required. An .mp4 (or .webm) under assets/, at most 15 MB (GitHub Pages;
  *              tools/check-updates.js measures it). It plays in its phone frame; nothing downloads
  *              until play is pressed.
  *              e.g. 'assets/updates/2026-10-25/live-trip.mp4'
  *     poster   string, required. A JPEG shown before the video plays (a frame from it, 720 px wide).
  *              e.g. 'assets/updates/2026-10-25/live-trip.jpg'
+ *     download string, optional. The same video at full resolution, offered as a "Full resolution"
+ *              link under the caption (fetched only when tapped), at most 50 MB.
+ *              e.g. 'assets/updates/2026-10-18/full-demo-hd.mp4'
  *   galleryNote string, optional. One line above the gallery, e.g. what is hidden in the screens.
  *              e.g. 'Number plates and map details are hidden; names are made-up test data.'
  *   cover      string, optional. The picture on the hero's "latest update" card: one of this week's
@@ -167,7 +170,7 @@ window.GTS_UPDATES = {
         'each step, after GTS has checked the vehicle. For now everything runs against a test backend ' +
         "on a laptop, so GTS is not yet usable by families. This week's run on a virtual Android phone " +
         'found 7 problems: 6 were fixed the same day, and one — GPS pausing when the driver swipes ' +
-        'GTS away — is being fixed next.',
+        'GTS away — is being fixed next. A 14-minute video now shows the whole flow on two test phones.',
       phase: 'live-trips',
       progress: {
         estimates: [
@@ -247,11 +250,21 @@ window.GTS_UPDATES = {
           text:
             'Every screen was tapped through on a virtual Android phone against a test backend on a ' +
             'laptop. Both trip directions fired every alert once and in order. The run found 7 ' +
-            'problems: 6 were fixed the same day, one is next. Not yet tried by families or on real roads.',
+            'problems: 6 were fixed the same day, one is next. A second run, with a second virtual phone ' +
+            "as the parent, found 5 more: the parent's map was a narrow strip (fixed the same day) and 4 " +
+            'smaller ones, next. Not yet tried by families or on real roads.',
           tags: ['tech'],
         },
       ],
       gallery: [
+        {
+          video: 'assets/updates/2026-10-18/full-demo.mp4',
+          poster: 'assets/updates/2026-10-18/full-demo.jpg',
+          download: 'assets/updates/2026-10-18/full-demo-hd.mp4',
+          caption: 'The whole of GTS, start to finish, on two test phones (14 min)',
+          alt: 'Demo video: a driver signs up and sends his papers, GTS approves him, a parent joins and follows the trip home on a map with alerts',
+          group: 'Full demo: start to finish',
+        },
         { src: 'assets/updates/2026-10-18/00-probe.jpg', caption: 'GTS opening on the test phone', group: 'Sign-up and privacy' },
         { src: 'assets/updates/2026-10-18/j1-01-language.jpg', caption: 'First screen: choose English or हिन्दी', group: 'Sign-up and privacy' },
         { src: 'assets/updates/2026-10-18/j1-02-notice.jpg', caption: 'What GTS uses and why, before anything else', group: 'Sign-up and privacy' },
@@ -336,13 +349,16 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-10-18/j6-32-trip-form-hindi.jpg', caption: 'Start a trip in Hindi', group: 'In Hindi' },
       ],
       galleryNote:
-        'Every screen from the run on a virtual Android phone, in order. Number plates and map details ' +
-        'are hidden; names and phone numbers are made-up test data.',
+        'First the full demo on two virtual phones — 0:07 the driver signs up · 1:23 vehicle and papers · ' +
+        '4:03 the school · 4:38 GTS approves the driver · 7:26 the invite code · 7:53 a parent joins · ' +
+        "9:18 the trip home, live · 12:54 Today's alerts and Hindi — then every screen from the first run, " +
+        'in order. Number plates and map details are hidden; names and phone numbers are made-up test data.',
       cover: 'assets/updates/2026-10-18/j6-20-home-trip-in-progress.jpg',
       next: [
         "A live run with a parent's real phone watching while the van drives",
         'Keeping GPS running when the driver swipes GTS away',
         'Real push notifications when GTS is closed',
+        'Kannada, then the other Indian languages',
       ],
     },
     {

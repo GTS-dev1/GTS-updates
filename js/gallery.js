@@ -8,7 +8,7 @@
  *   - items with `group`: one section per run of items sharing a group, each a <details> whose
  *     summary is the heading and the count. A gallery longer than GALLERY_OPEN_LIMIT starts with
  *     every section closed, under a line saying how to see them all, so 80 screens do not make the
- *     page endless; a shorter one starts open.
+ *     page endless (a section with a video still starts open); a shorter one starts open.
  *   - a video item ({ video, poster, caption }) plays inside its phone frame with the browser's
  *     own controls; nothing downloads until play is pressed (preload="none").
  * The screenshot viewer (js/lightbox.js) steps through every [data-shot] in the week, including
@@ -145,7 +145,7 @@
    * One video in a phone frame. It plays where it is (the viewer is for screenshots); the poster
    * shows until play is pressed, and preload="none" keeps the page from downloading it before.
    *
-   * @param {{video: string, poster: string, caption: string, alt?: string}} item
+   * @param {{video: string, poster: string, caption: string, alt?: string, download?: string}} item
    * @param {(src: string) => string} resolveSrc Address to load for a path (compose preview).
    * @returns {string}
    * @example renderVideo({ video: 'assets/updates/2026-10-25/live-trip.mp4', poster: 'assets/updates/2026-10-25/live-trip.jpg',
@@ -155,6 +155,9 @@
    *          //          aria-label="Video: A whole trip, start to End">  + caption with a 'Video' tag
    * @example renderVideo({ ...item, alt: 'The van moving on the map, then the alerts' }, (src) => src);
    *          // aria-label 'Video: The van moving on the map, then the alerts'; caption unchanged
+   * @example renderVideo({ ...item, download: 'assets/updates/2026-10-18/full-demo-hd.mp4' }, (src) => src);
+   *          // caption ends with <a class="shot__download" href="…full-demo-hd.mp4" download>Full resolution</a>
+   *          // WHY a link, not a second player: the big file downloads only when someone asks for it
    */
   function renderVideo(item, resolveSrc) {
     const label = item.alt || item.caption;
@@ -165,7 +168,11 @@
             poster="${escapeHtml(resolveSrc(item.poster))}" src="${escapeHtml(resolveSrc(item.video))}"
             aria-label="Video: ${escapeHtml(label)}"></video></span>
         </div>
-        <figcaption><span class="shot__kind">${icons.svg('play')}Video</span> ${escapeHtml(item.caption)}</figcaption>
+        <figcaption><span class="shot__kind">${icons.svg('play')}Video</span> ${escapeHtml(item.caption)}${
+          item.download
+            ? ` <a class="shot__download" href="${escapeHtml(resolveSrc(item.download))}" download>Full resolution</a>`
+            : ''
+        }</figcaption>
       </figure>`;
   }
 
@@ -199,6 +206,8 @@
    * @example renderGallery(weeks[0], { resolveSrc });
    *          // 82 screenshots in 12 groups -> the note, the hint '82 screenshots in 12 parts…',
    *          // 12 closed <details> 'Sign-up and privacy · 8', 'Driver papers and vehicle check · 10', …
+   * @example renderGallery(weekWithDemoFirst, { resolveSrc });
+   *          // 83 items: 'Full demo: start to finish · 1' (a video) starts open; the 12 others closed
    * @example renderGallery({ gallery: [a, b, c].map((shot) => ({ ...shot, group: 'Start a trip' })) }, { resolveSrc });
    *          // 3 items, one group -> one <details open> 'Start a trip · 3', no hint
    * @example renderGallery({ gallery: [] }, { resolveSrc });  // -> ''
@@ -225,8 +234,11 @@
         if (section.heading === undefined) {
           return `<div class="gallery__group">${renderTrack(section.items, 'Screenshots', context.resolveSrc)}</div>`;
         }
+        // WHY a video's section opens even in a long gallery: a video is the week's headline, and
+        // it costs only its poster until play is pressed.
+        const opens = startOpen || section.items.some(isVideo);
         return `
-          <details class="gallery__group"${startOpen ? ' open' : ''}>
+          <details class="gallery__group"${opens ? ' open' : ''}>
             <summary class="gallery__heading">
               <span class="gallery__heading-text">${escapeHtml(section.heading)}</span>
               <span class="gallery__count">${section.items.length}</span>
