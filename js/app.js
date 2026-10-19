@@ -46,6 +46,7 @@
   // The card shows the newest week's progress estimates, so the hero and the latest update agree.
   document.getElementById('glance').innerHTML = render.renderGlance(data.roadmap, data.weeks[0].progress);
   document.getElementById('road').innerHTML = render.renderRoadmap(data.roadmap);
+  showStopBeingBuilt();
   renderFeed();
   renderWeekIndex();
   renderFilters();
@@ -62,6 +63,26 @@
         document.getElementById(linkedId).scrollIntoView({ block: 'start' });
       });
     }
+  }
+
+  /**
+   * Scrolls a road wider than its panel sideways so the stop being built sits in the middle; the
+   * page itself does not move (scrollLeft, never scrollIntoView). WHY: from 960 px the road keeps
+   * a minimum width per stop (css/road.css), so with many stops it scrolls, and the stop that
+   * matters most would otherwise start off to the right.
+   *
+   * @example // 15 stops in a 1,120 px panel, 'Alerts' (stop 11) now -> scrolled ~300 px right
+   * @example // 15 stops in a 1,500 px panel -> nothing to scroll, nothing changes
+   * @example // a phone (vertical road) or a roadmap with no 'now' stop -> nothing changes
+   */
+  function showStopBeingBuilt() {
+    const road = document.querySelector('#road .road');
+    const current = road && road.querySelector('[aria-current="step"]');
+    if (!current || road.scrollWidth <= road.clientWidth) {
+      return;
+    }
+    const offset = current.getBoundingClientRect().left - road.getBoundingClientRect().left;
+    road.scrollLeft += offset - (road.clientWidth - current.offsetWidth) / 2;
   }
 
   /**

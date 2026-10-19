@@ -167,11 +167,24 @@
 
 /* ---------- Horizontal road from 960 px ---------- */
 @media (min-width: 960px) {
+  /* WHY a minimum column width and sideways scrolling: with 15 stops, equal shares of the panel
+     were narrower than a long word ("Foundation"), which ran into the next stop's text (week of
+     25 October 2026). Each stop keeps room for its words; a road wider than the panel scrolls,
+     and app.js starts it with the stop being built in view.
+     WHY the padding and the matching negative margin: a scrolling box clips what sticks out, and
+     the pulse around the stop being built reaches 18 px past its marker; the margin keeps the
+     road where it was inside the panel. */
   .road {
     --marker: 44px;
     --road-width: 10px;
+    --stop-min-width: 96px;
+    --pulse-room: 20px;
     display: grid;
-    grid-template-columns: repeat(var(--stops), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--stops), minmax(var(--stop-min-width), 1fr));
+    overflow-x: auto;
+    padding-block: var(--pulse-room);
+    margin-block: calc(-1 * var(--pulse-room));
+    scrollbar-width: thin;
   }
 
   .stop {

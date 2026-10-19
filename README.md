@@ -44,7 +44,8 @@ The data schema (every field, with examples) is documented at the top of `data/u
 
 - **Hero:** what GTS is, the latest week, and progress to the pilot at a glance.
 - **The journey:** every roadmap stop as a road (horizontal on wide screens, vertical on phones),
-  then the features after the pilot.
+  then the features after the pilot. On wide screens each stop keeps a minimum width, so a long
+  road scrolls sideways and opens with the stop being built in the middle.
 - **Weekly updates:** newest first. The two newest weeks are open, older ones collapse to their
   header, and anything past six sits behind "Show older updates". A sticky week index (a "Jump to
   week" menu on phones) marks the week being read.
