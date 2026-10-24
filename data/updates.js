@@ -162,17 +162,19 @@ window.GTS_UPDATES = {
   /** One entry per week, newest first. Paste a new week ABOVE the first one. */
   weeks: [
     {
-      id: '2026-10-25',
-      dateLabel: 'Week ending 25 October 2026',
-      title: 'Finding a driver, monthly fees, ratings, messages and 23 languages',
+      id: '2026-10-20',
+      dateLabel: '19–20 October 2026',
+      title: 'Finding a driver, fees, ratings and messages; a safer, clearer live trip',
       summary:
         'Most of the full product now works on test phones: a parent finds a driver near the ' +
         'school and the two agree a monthly fee, each month is recorded as paid by UPI or cash and ' +
         'the driver confirms it, parents rate trips and message their driver, and GTS speaks English ' +
-        "and India's 22 scheduled languages. A trip's GPS now keeps going when the driver swipes GTS " +
-        'away. Everything still runs against a test backend on a laptop, so families cannot use it ' +
-        'yet. A new 9-minute video shows the new parts on two test phones; the run found 2 problems, ' +
-        'both fixed the same day.',
+        "and India's 22 scheduled languages. On 20 October a security review tightened who sees " +
+        'what, each parent chose the speed they are alerted above, the live trip was redesigned ' +
+        'around a radar that reads at a glance, and a review of the code fixed a crash where one odd ' +
+        'record could empty a whole list. Everything still runs against a test backend on a laptop, ' +
+        'so families cannot use it yet. A 9-minute video shows the new parts on two test phones; the ' +
+        'run found 2 problems, both fixed the same day.',
       phase: 'find-driver',
       progress: {
         estimates: [
@@ -188,32 +190,16 @@ window.GTS_UPDATES = {
           icon: 'search',
           title: 'Find a driver',
           text:
-            'Parents look for drivers near the school: they pin the school and roughly where home is. ' +
-            "Drivers see only the area (about 1 km), never the home, the parent's name or the child's name.",
-          tags: ['parents', 'safety'],
-        },
-        {
-          icon: 'users',
-          title: 'Find students',
-          text:
-            'Drivers can choose to be shown to parents nearby, with their vehicle, rating and how many ' +
-            'children ride, never their phone number. They see requests near their schools without names.',
-          tags: ['drivers', 'safety'],
-        },
-        {
-          icon: 'check',
-          title: 'Agree a monthly fee',
-          text:
-            'Parent and driver take turns making an offer until one accepts. The deal then leads ' +
-            'straight to adding the child, with no invite code.',
-          tags: ['parents', 'drivers'],
+            'Parents look for drivers near the school; drivers who choose to be shown see requests near ' +
+            "their schools. Neither sees the other's home, name or phone number — only the area, about 1 km.",
+          tags: ['parents', 'drivers', 'safety'],
         },
         {
           icon: 'calendar',
-          title: 'Monthly fees, recorded',
+          title: 'Agree and record fees',
           text:
-            "Each month's fee shows on the parent's home. They pay the driver directly, by UPI or in " +
-            'cash, and record it; the driver confirms. GTS never holds the money.',
+            'Parent and driver take turns making an offer until one accepts. Each month is then ' +
+            'recorded as paid by UPI or cash, and the driver confirms it. GTS never holds the money.',
           tags: ['parents', 'drivers'],
         },
         {
@@ -225,19 +211,11 @@ window.GTS_UPDATES = {
           tags: ['drivers', 'tech'],
         },
         {
-          icon: 'star',
-          title: 'Rate the trip',
-          text:
-            'After a trip, parents give 1 to 5 stars and a few words. Drivers see the stars and the ' +
-            'words, never who wrote them.',
-          tags: ['parents', 'drivers'],
-        },
-        {
           icon: 'chat',
-          title: 'Messages',
+          title: 'Ratings and messages',
           text:
-            'A chat per child between parent and driver, a reply straight from an alert, and report ' +
-            'and block. Messages are deleted after 30 days.',
+            'After a trip, parents give 1 to 5 stars; drivers see the stars, never who gave them. A chat ' +
+            'per child, a reply straight from an alert, report and block; messages go after 30 days.',
           tags: ['parents', 'drivers', 'safety'],
         },
         {
@@ -256,55 +234,90 @@ window.GTS_UPDATES = {
             'deletion and a help desk answered by GTS staff. Built and tested, not yet walked on a phone.',
           tags: ['safety', 'parents'],
         },
+        {
+          icon: 'bell',
+          title: 'Your own speed alert',
+          text:
+            'Each parent chooses to be alerted above 40, 50 or 60 km/h. A slower overspeed still shows ' +
+            "in Today's alerts, and the app and the server decide from the same tested list of cases.",
+          tags: ['parents', 'safety'],
+        },
+        {
+          icon: 'lock',
+          title: 'Who sees what',
+          text:
+            "A security review of every screen and server step: a driver's number and plate reach only " +
+            'the parents of children who ride with him, staff see only what their screens use, and ' +
+            "nothing of GTS goes into a phone's backup.",
+          tags: ['safety', 'tech'],
+        },
+        {
+          icon: 'radar',
+          title: 'A clearer live trip',
+          text:
+            'The live trip opens on a radar around the pickup point, with the distance in large type and ' +
+            'honest minutes away; the map is one tap away. Colours were rechecked for contrast, and ' +
+            'screens re-flow at the largest text size instead of breaking words.',
+          tags: ['parents', 'design'],
+        },
       ],
       gallery: [
         {
-          video: 'assets/updates/2026-10-25/whats-new-demo.mp4',
-          poster: 'assets/updates/2026-10-25/whats-new-demo.jpg',
-          download: 'assets/updates/2026-10-25/whats-new-demo-hd.mp4',
+          video: 'assets/updates/2026-10-20/whats-new-demo.mp4',
+          poster: 'assets/updates/2026-10-20/whats-new-demo.jpg',
+          download: 'assets/updates/2026-10-20/whats-new-demo-hd.mp4',
           caption: "What's new since the last demo, on two test phones (9 min)",
           alt: 'Demo video: a parent finds a driver and agrees a monthly fee, records a cash payment the driver confirms, follows a trip that keeps going after the driver swipes GTS away, rates the trip, messages the driver and switches to Kannada',
           group: "What's new: the demo",
         },
-        { src: 'assets/updates/2026-10-25/m16-01-find-students.jpg', caption: 'Find students: the driver chooses to be shown to parents nearby', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-02-pick-on-map.jpg', caption: 'Pick on a map: move the map until the pin is on the school gate', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-03-school-pinned.jpg', caption: 'The school pinned; next, roughly where home is', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-04-drivers-near.jpg', caption: 'A driver near the school: vehicle, children riding, schools', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-05-asked.jpg', caption: 'Asked, and the request posted for any nearby driver', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-06-driver-request.jpg', caption: 'The driver sees "a parent", with no name', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-07-offer-received.jpg', caption: 'Sunita gets Ramesh\'s offer: accept, counter or decline', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-08-counter-received.jpg', caption: 'Ramesh gets Sunita\'s counter-offer', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-09-agreed.jpg', caption: 'Agreed, then add the child: no invite code needed', group: 'Finding a driver and agreeing a fee' },
-        { src: 'assets/updates/2026-10-25/m16-10-upi-id.jpg', caption: 'The driver adds his UPI ID (a made-up one)', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-11-fee-card.jpg', caption: 'This month\'s fee on the parent\'s home', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-12-pay-box.jpg', caption: 'Pay: by UPI, or record that it was paid', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-13-no-upi-app.jpg', caption: 'No UPI app on the test phone: GTS says so and offers the ID to copy', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-14-recorded.jpg', caption: 'Paid in cash and recorded: waiting for the driver to confirm', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-15-confirm.jpg', caption: 'The driver confirms he received it', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-16-fee-done.jpg', caption: 'Confirmed: the fee card leaves the home', group: 'The monthly fee' },
-        { src: 'assets/updates/2026-10-25/m16-17-start-trip.jpg', caption: 'Start a trip: to school, morning', group: 'A trip that survives a swipe' },
-        { src: 'assets/updates/2026-10-25/m16-18-live-map.jpg', caption: 'Sunita follows the van; alerts so far listed below the map', group: 'A trip that survives a swipe' },
-        { src: 'assets/updates/2026-10-25/m16-19-recents-swipe.jpg', caption: 'Mid-trip, the driver swipes GTS away from Recents', group: 'A trip that survives a swipe' },
-        { src: 'assets/updates/2026-10-25/m16-20-still-moving.jpg', caption: 'After the swipe: the van keeps moving on the parent\'s map', group: 'A trip that survives a swipe' },
-        { src: 'assets/updates/2026-10-25/m16-21-reopened.jpg', caption: 'GTS opened again: the same trip, nothing lost', group: 'A trip that survives a swipe' },
-        { src: 'assets/updates/2026-10-25/m16-22-reached-school.jpg', caption: 'Reached school: live tracking closes', group: 'A trip that survives a swipe' },
-        { src: 'assets/updates/2026-10-25/m16-23-end-trip.jpg', caption: 'End this trip? Parents stop seeing the van at once', group: 'After the trip: rating and messages' },
-        { src: 'assets/updates/2026-10-25/m16-24-rate-card.jpg', caption: 'How was today\'s trip? on the parent\'s home', group: 'After the trip: rating and messages' },
-        { src: 'assets/updates/2026-10-25/m16-25-rating.jpg', caption: 'Five stars and a few words', group: 'After the trip: rating and messages' },
-        { src: 'assets/updates/2026-10-25/m16-26-rating-sent.jpg', caption: 'Thank you: the rating was sent', group: 'After the trip: rating and messages' },
-        { src: 'assets/updates/2026-10-25/m16-27-driver-home.jpg', caption: 'The driver\'s home: the rating\'s average and a new message', group: 'After the trip: rating and messages' },
-        { src: 'assets/updates/2026-10-25/m16-28-chat.jpg', caption: 'A message and its reply', group: 'After the trip: rating and messages' },
-        { src: 'assets/updates/2026-10-25/m16-29-languages.jpg', caption: 'Choose your language: English and 22 Indian languages', group: 'In Kannada' },
-        { src: 'assets/updates/2026-10-25/m16-30-home-kannada.jpg', caption: 'Sunita\'s home in Kannada', group: 'In Kannada' },
-        { src: 'assets/updates/2026-10-25/m16-31-payments-kannada.jpg', caption: 'Payments in Kannada', group: 'In Kannada' },
+        { src: 'assets/updates/2026-10-20/m16-01-find-students.jpg', caption: 'Find students: the driver chooses to be shown to parents nearby', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-02-pick-on-map.jpg', caption: 'Pick on a map: move the map until the pin is on the school gate', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-03-school-pinned.jpg', caption: 'The school pinned; next, roughly where home is', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-04-drivers-near.jpg', caption: 'A driver near the school: vehicle, children riding, schools', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-05-asked.jpg', caption: 'Asked, and the request posted for any nearby driver', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-06-driver-request.jpg', caption: 'The driver sees "a parent", with no name', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-07-offer-received.jpg', caption: 'Sunita gets Ramesh\'s offer: accept, counter or decline', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-08-counter-received.jpg', caption: 'Ramesh gets Sunita\'s counter-offer', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-09-agreed.jpg', caption: 'Agreed, then add the child: no invite code needed', group: 'Finding a driver and agreeing a fee' },
+        { src: 'assets/updates/2026-10-20/m16-10-upi-id.jpg', caption: 'The driver adds his UPI ID (a made-up one)', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-11-fee-card.jpg', caption: 'This month\'s fee on the parent\'s home', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-12-pay-box.jpg', caption: 'Pay: by UPI, or record that it was paid', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-13-no-upi-app.jpg', caption: 'No UPI app on the test phone: GTS says so and offers the ID to copy', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-14-recorded.jpg', caption: 'Paid in cash and recorded: waiting for the driver to confirm', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-15-confirm.jpg', caption: 'The driver confirms he received it', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-16-fee-done.jpg', caption: 'Confirmed: the fee card leaves the home', group: 'The monthly fee' },
+        { src: 'assets/updates/2026-10-20/m16-17-start-trip.jpg', caption: 'Start a trip: to school, morning', group: 'A trip that survives a swipe' },
+        { src: 'assets/updates/2026-10-20/m16-18-live-map.jpg', caption: 'Sunita follows the van; alerts so far listed below the map', group: 'A trip that survives a swipe' },
+        { src: 'assets/updates/2026-10-20/m16-19-recents-swipe.jpg', caption: 'Mid-trip, the driver swipes GTS away from Recents', group: 'A trip that survives a swipe' },
+        { src: 'assets/updates/2026-10-20/m16-20-still-moving.jpg', caption: 'After the swipe: the van keeps moving on the parent\'s map', group: 'A trip that survives a swipe' },
+        { src: 'assets/updates/2026-10-20/m16-21-reopened.jpg', caption: 'GTS opened again: the same trip, nothing lost', group: 'A trip that survives a swipe' },
+        { src: 'assets/updates/2026-10-20/m16-22-reached-school.jpg', caption: 'Reached school: live tracking closes', group: 'A trip that survives a swipe' },
+        { src: 'assets/updates/2026-10-20/m16-23-end-trip.jpg', caption: 'End this trip? Parents stop seeing the van at once', group: 'After the trip: rating and messages' },
+        { src: 'assets/updates/2026-10-20/m16-24-rate-card.jpg', caption: 'How was today\'s trip? on the parent\'s home', group: 'After the trip: rating and messages' },
+        { src: 'assets/updates/2026-10-20/m16-25-rating.jpg', caption: 'Five stars and a few words', group: 'After the trip: rating and messages' },
+        { src: 'assets/updates/2026-10-20/m16-26-rating-sent.jpg', caption: 'Thank you: the rating was sent', group: 'After the trip: rating and messages' },
+        { src: 'assets/updates/2026-10-20/m16-27-driver-home.jpg', caption: 'The driver\'s home: the rating\'s average and a new message', group: 'After the trip: rating and messages' },
+        { src: 'assets/updates/2026-10-20/m16-28-chat.jpg', caption: 'A message and its reply', group: 'After the trip: rating and messages' },
+        { src: 'assets/updates/2026-10-20/m16-29-languages.jpg', caption: 'Choose your language: English and 22 Indian languages', group: 'In Kannada' },
+        { src: 'assets/updates/2026-10-20/m16-30-home-kannada.jpg', caption: 'Sunita\'s home in Kannada', group: 'In Kannada' },
+        { src: 'assets/updates/2026-10-20/m16-31-payments-kannada.jpg', caption: 'Payments in Kannada', group: 'In Kannada' },
+        { src: 'assets/updates/2026-10-20/oct20-01-live-on-the-way.jpg', caption: 'The live trip opens on a radar around the pickup point: the van 2.4 km away, about 5 minutes', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
+        { src: 'assets/updates/2026-10-20/oct20-02-live-nearby.jpg', caption: 'Nearby: inside the 1 km ring. The alert arrived just before the trip was opened, so its banner still offers See live; it floats above SOS and Call driver', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
+        { src: 'assets/updates/2026-10-20/oct20-03-live-nearby-night.jpg', caption: 'The same at night', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
+        { src: 'assets/updates/2026-10-20/oct20-04-live-largest-text.jpg', caption: 'At the largest text size, the name and the buttons move onto new lines instead of breaking words', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
+        { src: 'assets/updates/2026-10-20/oct20-05-live-hindi.jpg', caption: 'In Hindi', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
+        { src: 'assets/updates/2026-10-20/oct20-06-speed-alert.jpg', caption: 'Settings: each parent chooses to be alerted above 40, 50 or 60 km/h', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
+        { src: 'assets/updates/2026-10-20/oct20-07-rate-stars.jpg', caption: 'Rating a trip: the empty stars now stand out, even on a sunny screen', group: 'Added on 20 October: a clearer live trip and your own speed alert' },
       ],
       galleryNote:
         "First the demo of what's new on two virtual phones — 0:08 the driver is shown to parents · " +
         '0:32 a parent finds a driver · 1:30 an offer · 1:56 counter and agree · 2:43 the UPI ID · ' +
         "3:13 paying the month's fee · 4:00 the driver confirms · 4:31 a trip that survives a swipe · " +
         '6:30 end and rate · 7:22 messages · 8:25 Kannada — then stills from it, in order. ' +
-        'Number plates and map details are hidden; names, places, fees and the UPI ID are made-up test data.',
-      cover: 'assets/updates/2026-10-25/whats-new-demo.jpg',
+        'Number plates and map details are hidden; names, places, fees and the UPI ID are made-up test data. ' +
+        "The 20 October stills at the end are drawn by the app's own screen gallery on the laptop, not filmed " +
+        'on a phone.',
+      cover: 'assets/updates/2026-10-20/whats-new-demo.jpg',
       next: [
         'A cloud backend in Mumbai, so alerts arrive with GTS closed',
         'A run on real Android phones, including a budget one',
