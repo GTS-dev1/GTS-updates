@@ -164,14 +164,17 @@ window.GTS_UPDATES = {
     {
       id: '2026-10-25',
       dateLabel: '24–25 October 2026',
-      title: 'A safer SOS button, screens that load in shape, and tidier foundations',
+      title: 'A safer SOS from start to finish, screens that fit every language, and vibration with meaning',
       summary:
         'Raising an SOS now takes a 3-second hold, so a phone pulled from a pocket cannot raise one ' +
         'by mistake; people who use a screen reader get a 5-second countdown they can cancel. The ' +
         'live trip shows its own outline while it loads, the rating questions are written in full at ' +
         "the largest text size, and Kannada is drawn in GTS's own typeface. Behind the scenes, a " +
         "review of the code finished its most important items, and a failure on GTS's server is " +
-        'now logged as the step and an error code only. Everything still runs against a test ' +
+        'now logged as the step and an error code only. On 25 October the SOS screen gained big ' +
+        'reason tiles and a clearer screen after raising, choices and buttons stay whole in Kannada ' +
+        'and at the largest text size, and the phone gives a short vibration that means one thing — ' +
+        'which Settings can turn off. Everything still runs against a test ' +
         'backend on a laptop, so families cannot use it yet.',
       phase: 'alerts',
       progress: {
@@ -192,6 +195,33 @@ window.GTS_UPDATES = {
             'so. With a screen reader, a double-tap starts a countdown a second tap cancels. Call 112 ' +
             'stays one tap away.',
           tags: ['safety', 'parents', 'design'],
+        },
+        {
+          icon: 'sos',
+          title: 'After raising an SOS',
+          text:
+            'Three big reason tiles, one tap each. Once raised: when it went, whether GTS Support has ' +
+            'answered, Call 112 as the biggest button, Call driver, and "I\'m safe now" — which tells ' +
+            'GTS Support, so a person there checks before closing it.',
+          tags: ['safety', 'parents', 'design'],
+        },
+        {
+          icon: 'language',
+          title: 'Choices that fit every language',
+          text:
+            'In Kannada the speed-alert choices did not fit side by side even at normal text size; ' +
+            'now they stack when a label would not fit. At the largest text size a long button label ' +
+            'wraps onto centred lines instead of squeezing.',
+          tags: ['parents', 'design'],
+        },
+        {
+          icon: 'phone',
+          title: 'A vibration that means one thing',
+          text:
+            'A light tick for a choice, a firm one when an SOS hold completes, one when the van is ' +
+            'near, one when something reaches GTS and another when it is refused — and a switch in ' +
+            'Settings that turns them all off.',
+          tags: ['parents', 'design'],
         },
         {
           icon: 'clock',
@@ -243,13 +273,19 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-10-25/oct24-06-live-loading-night.jpg', caption: 'The outline at night', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
         { src: 'assets/updates/2026-10-25/oct24-07-rate-largest-text.jpg', caption: 'At the largest text size the rating questions sit above their boxes and are written in full', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
         { src: 'assets/updates/2026-10-25/oct24-08-home-kannada.jpg', caption: "Home in Kannada, now in GTS's own typeface", group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct25-01-sos-reasons.jpg', caption: 'The three reasons are big tiles with an icon each — one tap picks one; the note stays folded until it is needed', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
+        { src: 'assets/updates/2026-10-25/oct25-02-sos-raised.jpg', caption: 'After raising: when it went, whether GTS Support has answered, Call 112 first, Call driver, and "I\'m safe now" at the bottom', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
+        { src: 'assets/updates/2026-10-25/oct25-03-sos-raised-night.jpg', caption: 'The same screen at night', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
+        { src: 'assets/updates/2026-10-25/oct25-04-speed-choice-kannada.jpg', caption: 'In Kannada the 40, 50 and 60 km/h choices stack, so each one is read whole', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
+        { src: 'assets/updates/2026-10-25/oct25-05-vibration-setting.jpg', caption: 'Settings → Vibration: the short vibrations can be turned off; notifications follow the phone\'s own settings', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
+        { src: 'assets/updates/2026-10-25/oct25-06-largest-text-buttons.jpg', caption: 'At the largest text size, "Open Help & Support" wraps onto two centred lines beside its icon', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
       ],
       galleryNote:
         "These stills are drawn by the app's own screen gallery on the laptop, not filmed on a phone; " +
         'names and places are made-up test data.',
       cover: 'assets/updates/2026-10-25/oct24-01-sos-holding.jpg',
       next: [
-        'SOS: the three reasons as big tiles, and a clearer screen after raising',
+        'Notifications that look and sound different for each kind of alert',
         "India's scripts drawn by fonts that ship with GTS",
         'A cloud backend in Mumbai, so alerts arrive with GTS closed',
         'A run on real Android phones, including a budget one',
