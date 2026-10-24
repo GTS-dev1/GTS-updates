@@ -168,11 +168,11 @@ window.GTS_UPDATES = {
       summary:
         'Raising an SOS now takes a 3-second hold, so a phone pulled from a pocket cannot raise one ' +
         'by mistake; people who use a screen reader get a 5-second countdown they can cancel. The ' +
-        'live trip shows its own outline while it loads, and the rating questions are written in ' +
-        'full at the largest text size. Behind the scenes, a review of the code finished its most ' +
-        "important items, and a failure on GTS's server is now logged as the step and an error " +
-        'code only. Everything still runs against a test backend on a laptop, so families cannot ' +
-        'use it yet.',
+        'live trip shows its own outline while it loads, the rating questions are written in full at ' +
+        "the largest text size, and Kannada is drawn in GTS's own typeface. Behind the scenes, a " +
+        "review of the code finished its most important items, and a failure on GTS's server is " +
+        'now logged as the step and an error code only. Everything still runs against a test ' +
+        'backend on a laptop, so families cannot use it yet.',
       phase: 'alerts',
       progress: {
         estimates: [
@@ -210,6 +210,14 @@ window.GTS_UPDATES = {
           tags: ['parents', 'design'],
         },
         {
+          icon: 'language',
+          title: 'Kannada, in our letters',
+          text:
+            "Kannada — the language of the first town GTS will run in — is now drawn in GTS's own " +
+            'typeface, so it reads in the same voice as English and Hindi. Other scripts follow later.',
+          tags: ['parents', 'drivers', 'design'],
+        },
+        {
           icon: 'lock',
           title: 'Logs without details',
           text:
@@ -234,6 +242,7 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-10-25/oct24-05-live-loading.jpg', caption: 'While a trip is being fetched, the live trip shows its own outline instead of a spinner', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
         { src: 'assets/updates/2026-10-25/oct24-06-live-loading-night.jpg', caption: 'The outline at night', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
         { src: 'assets/updates/2026-10-25/oct24-07-rate-largest-text.jpg', caption: 'At the largest text size the rating questions sit above their boxes and are written in full', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-08-home-kannada.jpg', caption: "Home in Kannada, now in GTS's own typeface", group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
       ],
       galleryNote:
         "These stills are drawn by the app's own screen gallery on the laptop, not filmed on a phone; " +
