@@ -162,6 +162,91 @@ window.GTS_UPDATES = {
   /** One entry per week, newest first. Paste a new week ABOVE the first one. */
   weeks: [
     {
+      id: '2026-10-25',
+      dateLabel: '24–25 October 2026',
+      title: 'A safer SOS button, screens that load in shape, and tidier foundations',
+      summary:
+        'Raising an SOS now takes a 3-second hold, so a phone pulled from a pocket cannot raise one ' +
+        'by mistake; people who use a screen reader get a 5-second countdown they can cancel. The ' +
+        'live trip shows its own outline while it loads, and the rating questions are written in ' +
+        'full at the largest text size. Behind the scenes, a review of the code finished its most ' +
+        "important items, and a failure on GTS's server is now logged as the step and an error " +
+        'code only. Everything still runs against a test backend on a laptop, so families cannot ' +
+        'use it yet.',
+      phase: 'alerts',
+      progress: {
+        estimates: [
+          { label: 'First release (pilot)', value: 'about 55%' },
+          { label: 'Whole product', value: 'about 50%' },
+        ],
+        note:
+          'Unchanged this week: the work made what exists safer and clearer rather than adding ' +
+          'features. Built and tested on the laptop counts toward building only',
+      },
+      highlights: [
+        {
+          icon: 'sos',
+          title: 'Hold to raise SOS',
+          text:
+            'A 3-second hold with a light buzz at each quarter; lifting early raises nothing and says ' +
+            'so. With a screen reader, a double-tap starts a countdown a second tap cancels. Call 112 ' +
+            'stays one tap away.',
+          tags: ['safety', 'parents', 'design'],
+        },
+        {
+          icon: 'clock',
+          title: 'Loading in shape',
+          text:
+            'While a trip is being fetched, the live trip shows its outline — the header, the radar, ' +
+            'the distance and the buttons — so nothing jumps when it fills in.',
+          tags: ['parents', 'design'],
+        },
+        {
+          icon: 'star',
+          title: 'Ratings at any size',
+          text:
+            "The rating screen's questions sit above their boxes, so at the largest text size they " +
+            'are written in full instead of ending in "…".',
+          tags: ['parents', 'design'],
+        },
+        {
+          icon: 'lock',
+          title: 'Logs without details',
+          text:
+            "When a step on GTS's server fails, its log names the step and a short error code — " +
+            'never the names or record numbers inside the failed request.',
+          tags: ['safety', 'tech'],
+        },
+        {
+          icon: 'code',
+          title: 'Tidier foundations',
+          text:
+            'A review of the code finished its most important items: what a notification opens, what ' +
+            'keeps the reminders and which screen each address shows are each one clear, tested piece.',
+          tags: ['tech'],
+        },
+      ],
+      gallery: [
+        { src: 'assets/updates/2026-10-25/oct24-01-sos-holding.jpg', caption: 'Raising an SOS now takes a 3-second hold: half way, the fill has crossed half the button and it says "Keep holding…"', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-02-sos-released-early.jpg', caption: 'A quick tap raises nothing, and says why: "Released too soon. Hold for 3 seconds to raise SOS."', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-03-sos-holding-night.jpg', caption: 'The same hold at night', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-04-sos-holding-hindi.jpg', caption: 'In Hindi', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-05-live-loading.jpg', caption: 'While a trip is being fetched, the live trip shows its own outline instead of a spinner', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-06-live-loading-night.jpg', caption: 'The outline at night', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+        { src: 'assets/updates/2026-10-25/oct24-07-rate-largest-text.jpg', caption: 'At the largest text size the rating questions sit above their boxes and are written in full', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
+      ],
+      galleryNote:
+        "These stills are drawn by the app's own screen gallery on the laptop, not filmed on a phone; " +
+        'names and places are made-up test data.',
+      cover: 'assets/updates/2026-10-25/oct24-01-sos-holding.jpg',
+      next: [
+        'SOS: the three reasons as big tiles, and a clearer screen after raising',
+        "India's scripts drawn by fonts that ship with GTS",
+        'A cloud backend in Mumbai, so alerts arrive with GTS closed',
+        'A run on real Android phones, including a budget one',
+      ],
+    },
+    {
       id: '2026-10-20',
       dateLabel: '19–20 October 2026',
       title: 'Finding a driver, fees, ratings and messages; a safer, clearer live trip',
