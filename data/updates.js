@@ -174,7 +174,9 @@ window.GTS_UPDATES = {
         'now logged as the step and an error code only. On 25 October the SOS screen gained big ' +
         'reason tiles and a clearer screen after raising, choices and buttons stay whole in Kannada ' +
         'and at the largest text size, and the phone gives a short vibration that means one thing — ' +
-        'which Settings can turn off. Everything still runs against a test ' +
+        'which Settings can turn off. A 7-minute video, filmed on two test phones, shows the new ' +
+        'parts — and the run showed one gap: GTS staff answering an SOS cannot yet see whom to ' +
+        'call, which is next. Everything still runs against a test ' +
         'backend on a laptop, so families cannot use it yet.',
       phase: 'alerts',
       progress: {
@@ -265,6 +267,14 @@ window.GTS_UPDATES = {
         },
       ],
       gallery: [
+        {
+          video: 'assets/updates/2026-10-25/whats-new-oct25.mp4',
+          poster: 'assets/updates/2026-10-25/whats-new-oct25.jpg',
+          download: 'assets/updates/2026-10-25/whats-new-oct25-hd.mp4',
+          caption: "What's new since 19 October, on two test phones (7 min)",
+          alt: 'Demo video: a driver starts the trip home; a parent follows it on the radar and the map, raises an SOS with a 3-second hold, sees the van come near and arrive, and rates the trip; GTS staff answer the SOS and close it once the parent says they are safe; the parent turns vibration off and on and switches to Kannada',
+          group: "What's new: the demo",
+        },
         { src: 'assets/updates/2026-10-25/oct24-01-sos-holding.jpg', caption: 'Raising an SOS now takes a 3-second hold: half way, the fill has crossed half the button and it says "Keep holding…"', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
         { src: 'assets/updates/2026-10-25/oct24-02-sos-released-early.jpg', caption: 'A quick tap raises nothing, and says why: "Released too soon. Hold for 3 seconds to raise SOS."', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
         { src: 'assets/updates/2026-10-25/oct24-03-sos-holding-night.jpg', caption: 'The same hold at night', group: 'Added on 24 October: hold to raise SOS, clearer loading and rating' },
@@ -281,10 +291,12 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-10-25/oct25-06-largest-text-buttons.jpg', caption: 'At the largest text size, "Open Help & Support" wraps onto two centred lines beside its icon', group: 'Added late on 24 October and on 25 October: after raising an SOS, choices that fit, vibration' },
       ],
       galleryNote:
-        "These stills are drawn by the app's own screen gallery on the laptop, not filmed on a phone; " +
-        'names and places are made-up test data.',
-      cover: 'assets/updates/2026-10-25/oct24-01-sos-holding.jpg',
+        'The video is filmed on two test phones (virtual Android phones on the laptop) and shown ' +
+        "exactly as filmed; the stills are drawn by the app's own screen gallery. Names, the route " +
+        'and the number plate are made-up test data.',
+      cover: 'assets/updates/2026-10-25/whats-new-oct25.jpg',
       next: [
+        'GTS staff see who raised an SOS, with buttons to call the family and the driver',
         'Notifications that look and sound different for each kind of alert',
         "India's scripts drawn by fonts that ship with GTS",
         'A cloud backend in Mumbai, so alerts arrive with GTS closed',
