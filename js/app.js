@@ -105,6 +105,7 @@
         number: total - index,
         collapsed: index >= OPEN_WEEKS,
         isLatest: index === 0,
+        pageOf: (id) => shareLink.linkTo(id),
         older: olderWeek
           ? { id: olderWeek.id, number: total - index - 1, dateLabel: olderWeek.dateLabel }
           : null,

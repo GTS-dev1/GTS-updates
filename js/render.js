@@ -275,13 +275,16 @@
    *          resolveSrc?: (src: string) => string, isLatest?: boolean,
    *          older?: {id: string, number: number, dateLabel: string}|null,
    *          newer?: {id: string, number: number, dateLabel: string}|null,
-   *          linkTo?: (id: string) => string}} context
+   *          linkTo?: (id: string) => string, pageOf?: (id: string) => string}} context
    *   `number` is the update's count from the first one (the oldest is 1); `resolveSrc` lets the
    *   compose preview show a picked file before it is in the assets folder; `isLatest` marks the
    *   newest update; `older` is the update after this one on the page (`null` for the first one
    *   ever; leave it out in the compose preview); `newer` (the single-update page only) the one
    *   before it; `linkTo` makes the address of another update — `#2026-10-20` on the main page
-   *   (the default), `update.html?id=2026-10-20` on the single-update page.
+   *   (the default), `update.html?id=2026-10-20` on the single-update page; `pageOf` (the main
+   *   page only) makes an update's own-page address: its title then links there, beside an
+   *   "Open as a page" button (Teja, 25 October: "from the main page to particular update page
+   *   how to go").
    *
    * WHY the bar, the contents row and the end (Teja, 25 October 2026: "difficult to understand
    * where to where the updates to be read"): an update runs to thousands of pixels on a phone, and
@@ -355,6 +358,8 @@
            ${parts.map((part) => `<a href="${part.href}">${escapeHtml(part.label)}</a>`).join('')}
          </nav>`
       : '';
+    // The update's own page (main page: update.html?id=…); on that page itself, its own anchor.
+    const ownPage = context.pageOf ? context.pageOf(week.id) : `#${week.id}`;
     const latestBadge = context.isLatest ? '<span class="pill pill--live week__latest">Latest</span>' : '';
     const linkTo = context.linkTo || ((weekId) => `#${weekId}`);
     const older = context.older;
@@ -394,10 +399,13 @@
           <div class="week__meta">
             ${phase ? `<span class="week__phase">${icons.svg(phase.icon)}${escapeHtml(phase.label)}</span>` : ''}
           </div>
-          <h3 class="week__title" id="title-${id}"><a href="#${id}">${escapeHtml(week.title)}</a></h3>
+          <h3 class="week__title" id="title-${id}"><a href="${escapeHtml(ownPage)}">${escapeHtml(week.title)}</a></h3>
           <p class="week__summary">${escapeHtml(week.summary)}</p>
           ${contents}
-          <button type="button" class="week__copy" data-copy-link="${id}">${icons.svg('link')}<span>Copy link</span></button>
+          <div class="week__actions">
+            ${context.pageOf ? `<a class="week__open" href="${escapeHtml(ownPage)}">${icons.svg('arrow')}<span>Open as a page</span></a>` : ''}
+            <button type="button" class="week__copy" data-copy-link="${id}">${icons.svg('link')}<span>Copy link</span></button>
+          </div>
         </header>
         <div class="week__body" id="body-${id}"${context.collapsed ? ' hidden' : ''}>
           ${renderEstimates(week.progress)}

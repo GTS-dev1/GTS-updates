@@ -63,7 +63,8 @@ The data schema (every field, with examples) is documented at the top of `data/u
 - **Permalinks:** `index.html#2026-10-04` opens that week, expanding it if needed, and highlights it.
 - **One update on its own page — the link to share:** `update.html?id=2026-10-25` shows only that
   update, fully open, with **Newer** / **Older** and a way back to all updates; without a known id
-  it lists every update to choose from. Every update's **Copy link** copies this address.
+  it lists every update to choose from. On the main page an update's **title** and its **Open as a
+  page** button go there, and **Copy link** copies that address.
 - **Area filters:** Parents, Drivers, Safety & privacy, Design, Behind the scenes (from each
   highlight's `tags`).
 - **Screenshot viewer:** arrow keys or swipe, Esc to close, pinch-zoom on phones.
