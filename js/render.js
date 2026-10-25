@@ -47,6 +47,26 @@
   }
 
   /**
+   * A week's date label made short for the pinned bar: month names cut to three letters, the year
+   * dropped. WHY: on a phone the full label pushed Newer / Older onto a second line, and the bar
+   * stays pinned over the update, so every line it takes is a line less of the update.
+   *
+   * @param {string} label The week's dateLabel.
+   * @returns {string}
+   * @example compactDate('24–25 October 2026');           // -> '24–25 Oct'
+   * @example compactDate('Week ending 18 October 2026');  // -> 'Week ending 18 Oct'
+   * @example compactDate('30 September – 1 October 2026'); // -> '30 Sep – 1 Oct'
+   * @example compactDate('Soon');                          // -> 'Soon'   nothing to shorten
+   */
+  function compactDate(label) {
+    let short = String(label || '');
+    MONTHS_LONG.forEach((month, index) => {
+      short = short.replace(new RegExp(`\\b${month}\\b`, 'g'), MONTHS_SHORT[index]);
+    });
+    return short.replace(/\s+\d{4}$/, '');
+  }
+
+  /**
    * The standard date label for a week id; compose.html fills it in for the writer.
    *
    * @param {string} id yyyy-mm-dd.
@@ -252,9 +272,22 @@
    *
    * @param {object} week An entry from data/updates.js.
    * @param {{number: number, areasById: object, phasesById: object, collapsed?: boolean,
-   *          resolveSrc?: (src: string) => string}} context
+   *          resolveSrc?: (src: string) => string, isLatest?: boolean,
+   *          older?: {id: string, number: number, dateLabel: string}|null,
+   *          newer?: {id: string, number: number, dateLabel: string}|null,
+   *          linkTo?: (id: string) => string}} context
    *   `number` is the update's count from the first one (the oldest is 1); `resolveSrc` lets the
-   *   compose preview show a picked file before it is in the assets folder.
+   *   compose preview show a picked file before it is in the assets folder; `isLatest` marks the
+   *   newest update; `older` is the update after this one on the page (`null` for the first one
+   *   ever; leave it out in the compose preview); `newer` (the single-update page only) the one
+   *   before it; `linkTo` makes the address of another update — `#2026-10-20` on the main page
+   *   (the default), `update.html?id=2026-10-20` on the single-update page.
+   *
+   * WHY the bar, the contents row and the end (Teja, 25 October 2026: "difficult to understand
+   * where to where the updates to be read"): an update runs to thousands of pixels on a phone, and
+   * the weeks ran into each other under a thin line. Now a bar pinned under the top bar always
+   * says which update you are in (and links to the older one), a contents row jumps to its parts,
+   * and an end block closes it with the way on.
    * @returns {string}
    * @example renderWeek(weeks[0], { number: 1, areasById, phasesById });
    *          // <article class="week" id="2026-10-04"> 'Update 1', 'Week ending 4 October 2026',
@@ -304,11 +337,45 @@
       : '';
 
     const next = (week.next || []).length
-      ? `<aside class="next" aria-label="Coming next">
+      ? `<aside class="next" id="next-${id}" aria-label="Coming next">
            <h4 class="next__title">${icons.svg('route')} Coming next</h4>
            <ul class="next__list">${week.next.map((item) => `<li>${icons.svg('chevron-right')}<span>${escapeHtml(item)}</span></li>`).join('')}</ul>
          </aside>`
       : '';
+
+    // The parts of the update, for the contents row: only those it has.
+    const parts = [
+      highlights.length ? { href: `#new-${id}`, label: `What's new (${highlights.length})` } : null,
+      galleryBlock || feature ? { href: `#media-${id}`, label: 'Pictures and video' } : null,
+      next ? { href: `#next-${id}`, label: 'Coming next' } : null,
+    ].filter(Boolean);
+    const contents = parts.length > 1
+      ? `<nav class="week__contents" aria-label="In Update ${context.number}">
+           <span class="week__contents-label">In this update</span>
+           ${parts.map((part) => `<a href="${part.href}">${escapeHtml(part.label)}</a>`).join('')}
+         </nav>`
+      : '';
+    const latestBadge = context.isLatest ? '<span class="pill pill--live week__latest">Latest</span>' : '';
+    const linkTo = context.linkTo || ((weekId) => `#${weekId}`);
+    const older = context.older;
+    const newer = context.newer;
+    const newerLink = newer
+      ? `<a class="week__bar-step" href="${escapeHtml(linkTo(newer.id))}">${icons.svg('chevron-left')} Newer</a>`
+      : '';
+    const olderLink = older
+      ? `<a class="week__bar-step week__bar-older" href="${escapeHtml(linkTo(older.id))}">Older ${icons.svg(newer === undefined ? 'chevron-down' : 'chevron-right')}</a>`
+      : '';
+    const end = older === undefined
+      ? ''
+      : `<footer class="week__end">
+           <p class="week__end-label">End of Update ${context.number} · ${escapeHtml(week.dateLabel)}</p>
+           ${older
+             ? `<a class="week__end-next" href="${escapeHtml(linkTo(older.id))}">
+                  <span>Read the update before: <strong>Update ${older.number}</strong> · ${escapeHtml(older.dateLabel)}</span>
+                  ${icons.svg(newer === undefined ? 'chevron-down' : 'chevron-right')}</a>`
+             : '<p class="week__end-first">This is the first update.</p>'}
+           <a class="week__end-top" href="#${id}">Back to the start of Update ${context.number}</a>
+         </footer>`;
 
     const mediaLabel = gallery.mediaCountLabel(week.gallery, week.feature);
     const expandLabel =
@@ -316,24 +383,29 @@
       (mediaLabel ? ` · ${mediaLabel}` : '');
 
     return `
-      <article class="week${context.collapsed ? ' is-collapsed' : ''}" id="${id}" data-week aria-labelledby="title-${id}">
+      <article class="week${context.collapsed ? ' is-collapsed' : ''}${context.isLatest ? ' is-latest' : ''}" id="${id}" data-week aria-labelledby="title-${id}">
+        <div class="week__bar">
+          <span class="week__number">Update ${context.number}</span>
+          <time datetime="${id}" title="${escapeHtml(week.dateLabel)}">${escapeHtml(compactDate(week.dateLabel))}</time>
+          ${latestBadge}
+          <span class="week__bar-steps">${newerLink}${olderLink}</span>
+        </div>
         <header class="week__head">
           <div class="week__meta">
-            <span class="week__number">Update ${context.number}</span>
-            <time datetime="${id}">${escapeHtml(week.dateLabel)}</time>
             ${phase ? `<span class="week__phase">${icons.svg(phase.icon)}${escapeHtml(phase.label)}</span>` : ''}
           </div>
           <h3 class="week__title" id="title-${id}"><a href="#${id}">${escapeHtml(week.title)}</a></h3>
           <p class="week__summary">${escapeHtml(week.summary)}</p>
+          ${contents}
           <button type="button" class="week__copy" data-copy-link="${id}">${icons.svg('link')}<span>Copy link</span></button>
         </header>
         <div class="week__body" id="body-${id}"${context.collapsed ? ' hidden' : ''}>
           ${renderEstimates(week.progress)}
-          ${highlightCards ? `<ul class="highlights">${highlightCards}</ul>` : ''}
+          ${highlightCards ? `<ul class="highlights" id="new-${id}">${highlightCards}</ul>` : ''}
           <p class="week__filtered" hidden></p>
-          ${galleryBlock}
-          ${feature}
+          ${galleryBlock || feature ? `<div class="week__media" id="media-${id}">${galleryBlock}${feature}</div>` : ''}
           ${next}
+          ${end}
         </div>
         ${context.collapsed ? `<button type="button" class="week__expand" aria-expanded="false" aria-controls="body-${id}">${icons.svg('chevron-down')}<span>${escapeHtml(expandLabel)}</span></button>` : ''}
       </article>`;
@@ -364,6 +436,7 @@
     escapeHtml,
     shortDate,
     weekLabel,
+    compactDate,
     summariseRoadmap,
     renderGlance,
     renderEstimates,

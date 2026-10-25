@@ -47,16 +47,23 @@ The data schema (every field, with examples) is documented at the top of `data/u
 - **The journey:** every roadmap stop as a road (horizontal on wide screens, vertical on phones),
   then the features after the pilot. On wide screens each stop keeps a minimum width, so a long
   road scrolls sideways and opens with the stop being built in the middle.
-- **Weekly updates:** newest first. The two newest weeks are open, older ones collapse to their
+- **Weekly updates:** newest first. The newest update is open, older ones collapse to their
   header, and anything past six sits behind "Show older updates". A sticky week index (a "Jump to
-  week" menu on phones) marks the week being read.
+  week" menu on phones) marks the update being read.
+- **Where you are (25 October 2026):** each update has a bar pinned under the top bar while you read
+  it — "Update 5 · 24–25 Oct · Latest" and **Older** — a row under its summary that jumps to *What's
+  new*, *Pictures and video* and *Coming next*, and an end block: "End of Update 5", **Read the
+  update before**, and back to its start. Asked by Teja: the updates ran into each other and it was
+  hard to tell where one started and ended.
 - **Progress estimates:** a week's `progress` figures show at the top of the week, and the newest
   week's also on the hero's card, with the line saying how they are measured.
 - **Gallery:** phone-framed screenshots and videos. Items with a `group` show in sections with a
   heading and a count; a long gallery starts with its sections closed. Videos play in their frame
   and download nothing until played.
-- **Permalinks:** `index.html#2026-10-04` opens that week, expanding it if needed, and highlights it;
-  every week has a **Copy link** button.
+- **Permalinks:** `index.html#2026-10-04` opens that week, expanding it if needed, and highlights it.
+- **One update on its own page — the link to share:** `update.html?id=2026-10-25` shows only that
+  update, fully open, with **Newer** / **Older** and a way back to all updates; without a known id
+  it lists every update to choose from. Every update's **Copy link** copies this address.
 - **Area filters:** Parents, Drivers, Safety & privacy, Design, Behind the scenes (from each
   highlight's `tags`).
 - **Screenshot viewer:** arrow keys or swipe, Esc to close, pinch-zoom on phones.
@@ -68,6 +75,7 @@ The data schema (every field, with examples) is documented at the top of `data/u
 | Path | What it is |
 | --- | --- |
 | `index.html` | The page: containers that the scripts fill |
+| `update.html` | One update on its own page, the link **Copy link** gives (`?id=2026-10-25`) |
 | `compose.html` | Local tool for writing a week (not linked from the page) |
 | `data/updates.js` | The content: areas, roadmap and weekly entries, with the schema |
 | `js/icons.js` | The icon sprite and the list of icon names content may use |
@@ -75,13 +83,15 @@ The data schema (every field, with examples) is documented at the top of `data/u
 | `js/gallery.js` | The week's gallery as HTML: phones, sections, videos, the hero's cover |
 | `js/render.js` | Turns the data into HTML (used by the page and the compose preview) |
 | `js/app.js` | Page behaviour: feed, collapse, permalinks, week index, filters |
+| `js/update-page.js` | The single-update page: the update, Newer / Older, or the list to choose from |
+| `js/share-link.js` | The address to share an update (`update.html?id=…`) and the Copy link button |
 | `js/lightbox.js` | Screenshot viewer |
 | `js/theme.js` | Light/dark choice, applied before the first paint |
 | `js/validate.js` | The rules an update must pass (used by the checker and compose) |
 | `js/entry-source.js` | Writes a week as source text for compose's "Copy entry" |
 | `js/compose.js` | The compose form |
 | `tools/check-updates.js` | `node tools/check-updates.js`: checks the data before a commit |
-| `css/` | `base` (colours, type, shared pieces), `hero`, `road`, `updates`, `gallery`, `lightbox`, `compose` |
+| `css/` | `base` (colours, type, shared pieces), `hero`, `road`, `updates`, `gallery`, `lightbox`, `compose`, `single` (the single-update page) |
 | `assets/` | Favicon and screenshots |
 
 ## Add an icon or an area

@@ -204,6 +204,14 @@
   border-top: 0;
 }
 
+/* A jump to a later update (Older, its permalink) lands with its pinned bar right under the top
+   bar: its own top padding scrolls away too, so the update above leaves no squeezed bar behind.
+   HOW: the page already keeps var(--topbar-height) + var(--space-4) clear (scroll-padding-top in
+   base.css); taking the padding and that space-4 back off puts the bar at the top bar's edge. */
+.week + .week {
+  scroll-margin-top: calc(-1 * (var(--space-7) + var(--space-4)));
+}
+
 .week:focus {
   outline: none;
 }
@@ -247,7 +255,8 @@
   grid-template-areas:
     "meta copy"
     "title title"
-    "summary summary";
+    "summary summary"
+    "contents contents";
   align-items: center;
   column-gap: var(--space-3);
 }
@@ -307,18 +316,8 @@
   height: 16px;
 }
 
-@media (max-width: 420px) {
-  .week__copy span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-  .week__copy {
-    padding: 8px;
-  }
-}
+/* "Copy link" keeps its words on a phone too: it is how one update is shared (25 October 2026),
+   and an unlabelled chain icon was not read as "share". */
 
 .week__title {
   grid-area: title;
@@ -499,6 +498,149 @@
   margin-top: var(--space-3);
   font-size: 14px;
   color: var(--ink-muted);
+}
+
+/* ---------- Where am I: the pinned bar, the contents row, the end (25 October 2026) ----------
+   An update runs to thousands of pixels on a phone, and readers could not tell where one ended
+   and the next began (Teja). The bar stays pinned under the top bar for the whole update and says
+   which one it is; the contents row jumps to its parts; the end block closes it with the way on. */
+.week__bar {
+  position: sticky;
+  top: var(--topbar-height);
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin: 0 calc(-1 * var(--space-2)) var(--space-4);
+  padding: 10px var(--space-2);
+  background: var(--topbar-bg);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.week__bar .week__number {
+  font-size: 16px;
+}
+
+.week__bar-steps {
+  display: inline-flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.week__bar-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.week__bar-step:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.week__bar-step .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Targets of the contents row land below the top bar and the pinned bar. */
+.week [id^="new-"],
+.week [id^="media-"],
+.week [id^="next-"] {
+  scroll-margin-top: calc(var(--topbar-height) + 64px);
+}
+
+.week__contents {
+  grid-area: contents;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.week__contents-label {
+  margin-right: var(--space-1);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.week__contents a {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.week__contents a:hover {
+  border-color: var(--line-strong);
+}
+
+/* A collapsed update shows its header only: the contents would jump into a hidden body. */
+.week.is-collapsed .week__contents {
+  display: none;
+}
+
+.week__end {
+  margin-top: var(--space-7);
+  padding: var(--space-5);
+  border-radius: var(--radius-m);
+  border: 1px dashed var(--line-strong);
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.week__end-label {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.week__end-next {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.week__end-next .icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.week__end-first {
+  color: var(--ink-muted);
+}
+
+.week__end-top {
+  color: var(--ink-muted);
+  font-size: 15px;
 }
 
 /* ---------- Coming next ---------- */

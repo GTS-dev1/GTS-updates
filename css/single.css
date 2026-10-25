@@ -1,0 +1,63 @@
+/*
+  The single-update page (update.html): one update with a way back to all of them, or the list to
+  choose from. The update itself uses css/updates.css and css/gallery.css, as on the main page.
+*/
+
+.single {
+  padding-top: var(--space-5);
+}
+
+.single__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  color: var(--ink-muted);
+  font-size: 15px;
+}
+
+.single__back::before {
+  content: "←";
+}
+
+/* The update is the only one here: no line above it. */
+.single .week {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.single__pick-heading {
+  font-size: clamp(28px, 4.2vw, 40px);
+  font-weight: 700;
+  font-stretch: var(--wide);
+}
+
+.single__pick {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.single__pick a {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-4);
+  border-radius: var(--radius-m);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-decoration: none;
+}
+
+.single__pick a:hover {
+  border-color: var(--line-strong);
+}
+
+.single__pick-meta {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.single__pick-title {
+  font-weight: 650;
+  color: var(--ink);
+}

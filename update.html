@@ -1,0 +1,91 @@
+<!doctype html>
+<!--
+  One GTS update on its own page — the link to share (Teja, 25 October 2026: "a separate page …
+  where only the particular update will be shown and I can share the particular update link").
+  WHAT: update.html?id=2026-10-25 shows that update, fully open, with Newer / Older and a way back to
+  all updates; without a known id it lists every update to choose from.
+  HOW: the same data (data/updates.js) and renderer (js/render.js) as index.html, so an update looks
+  exactly the same on both pages; js/update-page.js puts it together. No build step.
+  PUBLIC: product progress only — node tools/check-updates.js guards the data.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GTS Update</title>
+    <meta name="description" content="One build update from GTS (Go to Shore): safe school journeys, tracked live." />
+    <meta name="theme-color" content="#070B1F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F3F6FC" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wdth,wght@75..125,300..800&family=Anek+Latin:wdth,wght@75..125,300..800&display=swap"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/updates.css" />
+    <link rel="stylesheet" href="css/gallery.css" />
+    <link rel="stylesheet" href="css/lightbox.css" />
+    <link rel="stylesheet" href="css/single.css" />
+    <script src="js/theme.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#single">Skip to the update</a>
+
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="index.html" aria-label="GTS updates, all updates">
+          <img class="brand__tile" src="assets/favicon.svg" alt="" width="32" height="32" />
+          <span class="brand__name">GTS</span>
+          <span class="brand__sub">Updates</span>
+        </a>
+        <nav class="topbar__nav" aria-label="Sections">
+          <a href="index.html#updates">All updates</a>
+        </nav>
+        <button type="button" class="icon-button" data-theme-toggle aria-label="Switch theme">
+          <svg class="icon icon--theme-dark" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-moon"></use></svg>
+          <svg class="icon icon--theme-light" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-sun"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="top" class="single">
+      <a class="single__back" href="index.html#updates" id="single-back">All updates</a>
+      <div class="feed" id="single"></div>
+      <noscript><p class="empty">This page needs JavaScript to show the update.</p></noscript>
+    </main>
+
+    <footer class="footer">
+      <p>GTS — Go to Shore. Screens show demo data; no real children, families or trips.</p>
+      <p><a href="index.html">All updates</a></p>
+    </footer>
+
+    <dialog class="lightbox" id="lightbox" aria-label="Screenshot viewer">
+      <div class="lightbox__stage">
+        <button type="button" class="lightbox__nav lightbox__nav--prev icon-button" data-lightbox-prev aria-label="Previous screenshot">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-chevron-left"></use></svg>
+        </button>
+        <figure class="lightbox__figure">
+          <img class="lightbox__image" alt="" />
+          <figcaption><span class="lightbox__counter"></span> <span class="lightbox__caption"></span></figcaption>
+        </figure>
+        <button type="button" class="lightbox__nav lightbox__nav--next icon-button" data-lightbox-next aria-label="Next screenshot">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-chevron-right"></use></svg>
+        </button>
+      </div>
+      <button type="button" class="lightbox__close icon-button" aria-label="Close viewer">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#gts-icon-close"></use></svg>
+      </button>
+    </dialog>
+
+    <script src="data/updates.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/escape-html.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/lightbox.js"></script>
+    <script src="js/share-link.js"></script>
+    <script src="js/update-page.js"></script>
+  </body>
+</html>

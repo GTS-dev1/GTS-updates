@@ -18,19 +18,22 @@
 (function renderUpdatesPage() {
   'use strict';
 
-  /** Weeks shown fully open at the top; older ones start collapsed to their header and summary. */
-  const OPEN_WEEKS = 2;
+  /**
+   * Weeks shown fully open at the top; older ones start collapsed to their header and summary.
+   * WHY one (was two, until 25 October 2026): two open updates ran into each other for thousands
+   * of pixels on a phone, and readers could not tell where one ended (Teja). Each older update is
+   * one tap away — its card, its permalink, or the "Older" link and end block of the one above.
+   */
+  const OPEN_WEEKS = 1;
   /** Weeks on the page before "Show older updates"; keeps a long history short to scroll. */
   const VISIBLE_WEEKS = 6;
   /** How long a week opened by its permalink stays highlighted (ms); matches the CSS animation. */
   const TARGET_FLASH_MS = 2400;
-  /** How long "Copied" shows on a copy-link button before it reads "Copy link" again (ms). */
-  const COPIED_MS = 2000;
   /** The band of the screen (from the top) that decides which week the index marks as current. */
   const READING_BAND = '-25% 0px -65% 0px';
 
   const data = window.GTS_UPDATES;
-  const { render, icons, lightbox } = window.GTS;
+  const { render, icons, lightbox, shareLink } = window.GTS;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   icons.mount(document);
@@ -96,10 +99,15 @@
     const total = data.weeks.length;
     let html = '';
     data.weeks.forEach((week, index) => {
+      const olderWeek = data.weeks[index + 1];
       html += render.renderWeek(week, {
         ...lookups,
         number: total - index,
         collapsed: index >= OPEN_WEEKS,
+        isLatest: index === 0,
+        older: olderWeek
+          ? { id: olderWeek.id, number: total - index - 1, dateLabel: olderWeek.dateLabel }
+          : null,
       });
     });
     const olderCount = Math.max(0, total - VISIBLE_WEEKS);
@@ -128,7 +136,7 @@
       }
       const copy = event.target.closest('[data-copy-link]');
       if (copy) {
-        copyWeekLink(copy);
+        shareLink.copy(copy);
       }
     });
   }
@@ -250,54 +258,22 @@
   }
 
   /**
-   * Copies the week's permalink and confirms on the button for COPIED_MS.
-   * The Clipboard API needs a secure page; from file:// or an old browser a hidden text field and
-   * the older copy command do the job instead.
-   *
-   * @param {HTMLButtonElement} button A [data-copy-link="2026-10-04"] button.
-   * @example copyWeekLink(button);  // clipboard: 'https://gts-dev1.github.io/GTS-updates/#2026-10-04'
-   * @example copyWeekLink(button);  // opened from disk: 'file:///C:/…/index.html#2026-10-04'
-   */
-  function copyWeekLink(button) {
-    const url = `${window.location.href.split('#')[0]}#${button.dataset.copyLink}`;
-    const label = button.querySelector('span');
-    const confirm = (text) => {
-      label.textContent = text;
-      window.setTimeout(() => {
-        label.textContent = 'Copy link';
-      }, COPIED_MS);
-    };
-    const fallback = () => {
-      const field = document.createElement('textarea');
-      field.value = url;
-      field.setAttribute('readonly', '');
-      field.style.position = 'fixed';
-      field.style.opacity = '0';
-      document.body.append(field);
-      field.select();
-      const copied = document.execCommand('copy');
-      field.remove();
-      confirm(copied ? 'Copied' : 'Copy failed');
-    };
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(url).then(() => confirm('Copied'), fallback);
-    } else {
-      fallback();
-    }
-  }
-
-  /**
    * The week index: a sticky list on wide screens and a "Jump to week" menu on phones, both
    * built from the same list items.
    *
-   * @example // 1 week -> one entry: '4 Oct' · 'The app runs on a real phone'
+   * Each entry says "Update N" as the update itself does (25 October 2026), so the list and the
+   * pinned bar name an update the same way.
+   *
+   * @example // 1 week  -> one entry: 'Update 1 · 4 Oct' · 'The app runs on a real phone'
+   * @example // 5 weeks -> 'Update 5 · 25 Oct' first, 'Update 1 · 4 Oct' last (newest first)
    */
   function renderWeekIndex() {
+    const total = data.weeks.length;
     const items = data.weeks
       .map(
-        (week) => `
+        (week, index) => `
           <li><a href="#${render.escapeHtml(week.id)}" data-index-link="${render.escapeHtml(week.id)}">
-            <span class="index__date">${render.escapeHtml(render.shortDate(week.id))}</span>
+            <span class="index__date">Update ${total - index} · ${render.escapeHtml(render.shortDate(week.id))}</span>
             <span class="index__title">${render.escapeHtml(week.title)}</span>
           </a></li>`,
       )

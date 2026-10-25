@@ -166,18 +166,12 @@ window.GTS_UPDATES = {
       dateLabel: '24–25 October 2026',
       title: 'A safer SOS from start to finish, screens that fit every language, and vibration with meaning',
       summary:
-        'Raising an SOS now takes a 3-second hold, so a phone pulled from a pocket cannot raise one ' +
-        'by mistake; people who use a screen reader get a 5-second countdown they can cancel. The ' +
-        'live trip shows its own outline while it loads, the rating questions are written in full at ' +
-        "the largest text size, and Kannada is drawn in GTS's own typeface. Behind the scenes, a " +
-        "review of the code finished its most important items, and a failure on GTS's server is " +
-        'now logged as the step and an error code only. On 25 October the SOS screen gained big ' +
-        'reason tiles and a clearer screen after raising, choices and buttons stay whole in Kannada ' +
-        'and at the largest text size, and the phone gives a short vibration that means one thing — ' +
-        'which Settings can turn off. A 7-minute video, filmed on two test phones, shows the new ' +
-        'parts — and the run showed one gap: GTS staff answering an SOS cannot yet see whom to ' +
-        'call, which is next. Everything still runs against a test ' +
-        'backend on a laptop, so families cannot use it yet.',
+        'An SOS now takes a 3-second hold, so a phone pulled from a pocket cannot raise one by ' +
+        "mistake; once raised, the screen shows when it went, GTS Support's answer, Call 112 and " +
+        '"I\'m safe now". Screens fit every language and text size, Kannada is drawn in GTS\'s own ' +
+        'typeface, and each short vibration means one thing. A 7-minute video on two test phones ' +
+        'shows it all — and found one gap, next to fix: GTS staff answering an SOS cannot yet see ' +
+        'whom to call. Everything still runs on a test backend, so families cannot use it yet.',
       phase: 'alerts',
       progress: {
         estimates: [

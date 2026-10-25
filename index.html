@@ -5,6 +5,7 @@
   HOW: no build step and no framework. js/icons.js (sprite), js/render.js (HTML for each part),
   js/lightbox.js (screenshot viewer) and js/app.js (puts it together) fill the empty containers
   below; js/theme.js runs first, in <head>, so the light/dark choice applies before the first paint.
+  One update alone, to share: update.html?id=<week id> (js/update-page.js); "Copy link" gives it.
   PUBLIC: this repository is public. Product progress only — no costs, legal research, business
   model, partner or pilot dates, or personal data. node tools/check-updates.js guards the data.
 -->
@@ -92,7 +93,7 @@
         <div class="section-head updates__head">
           <div>
             <h2 class="section-title" id="updates-title">Weekly updates</h2>
-            <p class="section-sub">Newest first. Screens show demo data.</p>
+            <p class="section-sub">Newest first. The latest update is open; tap an older one to read it. Each update has what's new, pictures and a video, and what's coming next. Screens show demo data.</p>
           </div>
           <details class="jump">
             <summary><span>Jump to week</span> <span class="jump__count" id="jump-count"></span></summary>
@@ -143,6 +144,7 @@
     <script src="js/gallery.js"></script>
     <script src="js/render.js"></script>
     <script src="js/lightbox.js"></script>
+    <script src="js/share-link.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>
