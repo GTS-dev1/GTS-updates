@@ -13,8 +13,9 @@ also opens straight from disk (`index.html`).
 
 1. **Screenshots.** Put the week's phone screenshots in `assets/updates/<yyyy-mm-dd>/` (the Sunday
    the week ends on), as JPEGs about 720 px wide, with short kebab-case names
-   (`sign-in-code.jpg`). Demo data only; cover anything real (a number plate, map labels) before
-   converting. **Videos:** an `.mp4` under 15 MB per video (the checker measures it), with a poster
+   (`sign-in-code.jpg`). Demo data only — made-up people, test numbers, the made-up route and the sample
+   plate — and then **no blurring or covering**: screens go up exactly as filmed (Teja, 25 October
+   2026: the founder read a blurred map as the app not working). **Videos:** an `.mp4` under 15 MB per video (the checker measures it), with a poster
    JPEG from the video beside it.
 2. **Compose.** Open `compose.html` in a browser (double-click; it works offline). Fill in the week,
    the highlights (pick an icon and the areas), pick the screenshots and videos, caption each one
