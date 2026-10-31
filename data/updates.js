@@ -162,6 +162,137 @@ window.GTS_UPDATES = {
   /** One entry per week, newest first. Paste a new week ABOVE the first one. */
   weeks: [
     {
+      id: '2026-11-01',
+      dateLabel: '25 October – 1 November 2026',
+      title: "The driver's map, an SOS staff can act on, and notifications you can tell apart",
+      summary:
+        "The driver now sees the trip on a map, with the stops in the order to drive them and one " +
+        'tap to Google Maps for the roads. GTS staff answering an SOS see whom to call — the ' +
+        "parent, the child, the driver and where the van was — and closing an SOS now asks first. " +
+        "Parents see the driver's number on their child's card, and every GTS notification shows " +
+        'the van in the status bar, sorted so each kind can be silenced on its own. A new video, ' +
+        'filmed on test phones with their graphics chip on, shows the maps sharp and smooth.',
+      phase: 'alerts',
+      progress: {
+        estimates: [
+          { label: 'First release (pilot)', value: 'about 55%' },
+          { label: 'Whole product', value: 'about 50%' },
+        ],
+        note:
+          "Unchanged: the new pieces — the driver's map, whom to call on an SOS — and two more " +
+          'runs on test phones move feature building, but what moves the total most is still ' +
+          'ahead: the cloud backend and a run on real phones',
+      },
+      highlights: [
+        {
+          icon: 'route',
+          title: "The driver's map",
+          text:
+            'The running trip shows a map with the van and each stop. The stops are listed in the ' +
+            'order to drive them — done first, then the nearest — with Next on one, how far each ' +
+            'is, and Done once there. On the way home the school comes first.',
+          tags: ['drivers', 'design'],
+        },
+        {
+          icon: 'map-pin',
+          title: 'Directions in one tap',
+          text:
+            'Each stop still ahead has Directions: Google Maps opens with the driving route to it, ' +
+            'because Maps knows the roads and the traffic. It is given that one place, only when tapped.',
+          tags: ['drivers', 'safety'],
+        },
+        {
+          icon: 'sos',
+          title: 'An SOS staff can act on',
+          text:
+            "GTS staff see the parent's name and number, their child on that trip, the driver with " +
+            "the van's plate and their number, and where the van was — with Call parent, Call driver and Open map. " +
+            'The list says how long ago each SOS was raised.',
+          tags: ['safety', 'design'],
+        },
+        {
+          icon: 'shield',
+          title: 'Closing an SOS asks first',
+          text:
+            '"Close this SOS? Close it only after checking with the parent that everyone is safe." ' +
+            "Close request moved under the conversation, so the screen's title stays whole at the " +
+            'largest text size.',
+          tags: ['safety', 'design'],
+        },
+        {
+          icon: 'phone',
+          title: "The driver's number at home",
+          text:
+            "Once GTS shares it, the child's card shows the driver's number and Call driver all day, " +
+            'not only while a trip is live.',
+          tags: ['parents'],
+        },
+        {
+          icon: 'bell',
+          title: 'Notifications you can tell apart',
+          text:
+            'Every GTS notification shows the van in the status bar (it was a plain circle). Six ' +
+            'kinds — trip alerts, safety alerts, messages, trip updates, payments and papers, ' +
+            "reminders — each have their own switch in Android's settings, named in the person's " +
+            "language. The app icon follows Android's themed icons.",
+          tags: ['parents', 'drivers', 'design'],
+        },
+        {
+          icon: 'camera',
+          title: 'Maps that look right on video',
+          text:
+            "Last week's video showed the map blurred and jerky. This week's was filmed with the " +
+            "test phone's graphics chip on and recorded at twice the frames: the map is sharp and the " +
+            'van glides.',
+          tags: ['design', 'tech'],
+        },
+        {
+          icon: 'code',
+          title: 'A code review, closed',
+          text:
+            'All 63 items of the October code review are fixed, each with a test that fails if the ' +
+            'fix is undone. Along the way the tests found and closed a few gaps nobody had noticed.',
+          tags: ['tech'],
+        },
+      ],
+      gallery: [
+        {
+          video: 'assets/updates/2026-11-01/whats-new-nov1.mp4',
+          poster: 'assets/updates/2026-11-01/whats-new-nov1.jpg',
+          download: 'assets/updates/2026-11-01/whats-new-nov1-hd.mp4',
+          caption: "What's new since 25 October, on two test phones (3 min 24 s)",
+          alt: "Demo video: a driver starts the trip home and sees the map and stops — the school done, the child next, how far — then taps Directions and Google Maps shows the driving route; the parent follows the van on a sharp map, gets the 'about 1 km away' notification and sees the child arrive; the driver sees every stop done and ends the trip",
+          group: "What's new: the demo",
+        },
+        { src: 'assets/updates/2026-11-01/nov1-01-driver-morning-start.jpg', caption: 'The morning trip: the van and both stops on the map; Anjali is next, 2.0 km away, the school 5.0 km', group: "The driver's map" },
+        { src: 'assets/updates/2026-11-01/nov1-02-driver-picked-up.jpg', caption: 'Anjali picked up: that stop shows Done, and the school becomes next', group: "The driver's map" },
+        { src: 'assets/updates/2026-11-01/nov1-03-driver-trip-home.jpg', caption: 'The trip home: the school is done first, Anjali is next, 1.0 km away', group: "The driver's map" },
+        { src: 'assets/updates/2026-11-01/nov1-04-maps-directions.jpg', caption: 'Directions: Google Maps opens with the driving route to the stop (3 min)', group: "The driver's map" },
+        { src: 'assets/updates/2026-11-01/nov1-05-driver-all-done.jpg', caption: 'Both stops done, every alert listed with its time; End trip asks first', group: "The driver's map" },
+        { src: 'assets/updates/2026-11-01/nov1-06-parent-map.jpg', caption: "The parent's map, sharp now: the van 0.4 km from Anjali's pickup, about 1 min away", group: 'The parent' },
+        { src: 'assets/updates/2026-11-01/nov1-07-parent-arrived.jpg', caption: 'Arrived: live tracking closes by itself, and the list keeps what happened', group: 'The parent' },
+        { src: 'assets/updates/2026-11-01/nov1-08-parent-card-driver-number.jpg', caption: "The child's card shows the driver's number and Call driver, even with no trip running", group: 'The parent' },
+        { src: 'assets/updates/2026-11-01/nov1-09-staff-sos-whom-to-call.jpg', caption: 'GTS staff on an SOS: whom to call, how long ago it was raised, and where the van was', group: 'GTS staff and an SOS' },
+        { src: 'assets/updates/2026-11-01/nov1-10-staff-sos-whom-to-call-night.jpg', caption: 'The same at night', group: 'GTS staff and an SOS' },
+        { src: 'assets/updates/2026-11-01/nov1-11-staff-close-sos-asks.jpg', caption: 'Closing an SOS asks first, and says to check with the parent that everyone is safe', group: 'GTS staff and an SOS' },
+        { src: 'assets/updates/2026-11-01/nov1-12-staff-close-request-largest-text.jpg', caption: "At the largest text size: Close request under the conversation, the screen's title whole", group: 'GTS staff and an SOS' },
+        { src: 'assets/updates/2026-11-01/nov1-13-notification-shade.jpg', caption: "The van in the status bar and the shade: a driver's reminder and the running trip", group: 'Notifications and the icon' },
+        { src: 'assets/updates/2026-11-01/nov1-14-themed-icon.jpg', caption: "With Android's themed icons on, GTS's van takes the wallpaper's colours like the other apps", group: 'Notifications and the icon' },
+      ],
+      galleryNote:
+        'The video and the phone stills are filmed on test phones (virtual Android phones on the ' +
+        "laptop) and shown exactly as filmed; the staff stills are drawn by the app's own screen " +
+        'gallery. Names, the route and the number plate are made-up test data; street names come ' +
+        'from the map.',
+      cover: 'assets/updates/2026-11-01/whats-new-nov1.jpg',
+      next: [
+        'A cloud backend in Mumbai, so alerts arrive with GTS closed',
+        'A run on real Android phones, including a budget one',
+        "India's scripts drawn by fonts that ship with GTS",
+        'Settings and privacy walked through on a phone: deleting an account, the help desk',
+      ],
+    },
+    {
       id: '2026-10-25',
       dateLabel: '24–25 October 2026',
       title: 'A safer SOS from start to finish, screens that fit every language, and vibration with meaning',
