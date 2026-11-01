@@ -247,6 +247,16 @@ window.GTS_UPDATES = {
           tags: ['design', 'tech'],
         },
         {
+          icon: 'file',
+          title: "A driver's photo is kept when the phone closes GTS",
+          text:
+            'On a phone short of memory, Android sometimes closes an app while the camera is open, ' +
+            "and the driver's photo of a paper or the vehicle was lost. GTS now opens the papers " +
+            'again by itself and adds the photo. Testing it found one more thing, fixed too: a new ' +
+            'driver who reopened GTS saw "Still trying to reach GTS" and nothing else.',
+          tags: ['drivers', 'tech'],
+        },
+        {
           icon: 'code',
           title: 'A code review, closed',
           text:
@@ -278,6 +288,7 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-11-01/nov1-12-staff-close-request-largest-text.jpg', caption: "At the largest text size: Close request under the conversation, the screen's title whole", group: 'GTS staff and an SOS' },
         { src: 'assets/updates/2026-11-01/nov1-13-notification-shade.jpg', caption: "The van in the status bar and the shade: a driver's reminder and the running trip", group: 'Notifications and the icon' },
         { src: 'assets/updates/2026-11-01/nov1-14-themed-icon.jpg', caption: "With Android's themed icons on, GTS's van takes the wallpaper's colours like the other apps", group: 'Notifications and the icon' },
+        { src: 'assets/updates/2026-11-01/nov1-15-driver-photo-kept.jpg', caption: 'Android closed GTS while the camera was open: GTS opened the papers again and added the front photo', group: "Drivers' papers" },
       ],
       galleryNote:
         'The video and the phone stills are filmed on test phones (virtual Android phones on the ' +
