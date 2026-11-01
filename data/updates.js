@@ -171,7 +171,8 @@ window.GTS_UPDATES = {
         "parent, the child, the driver and where the van was — and closing an SOS now asks first. " +
         "Parents see the driver's number on their child's card, and every GTS notification shows " +
         'the van in the status bar, sorted so each kind can be silenced on its own. A new video, ' +
-        'filmed on test phones with their graphics chip on, shows the maps sharp and smooth.',
+        'filmed on test phones with their graphics chip on, shows the maps sharp and smooth. ' +
+        'Later the same day the trip map became live: it follows the van and opens full screen.',
       phase: 'alerts',
       progress: {
         estimates: [
@@ -190,16 +191,9 @@ window.GTS_UPDATES = {
           text:
             'The running trip shows a map with the van and each stop. The stops are listed in the ' +
             'order to drive them — done first, then the nearest — with Next on one, how far each ' +
-            'is, and Done once there. On the way home the school comes first.',
+            'is, and Done once there. Each stop ahead has Directions: Google Maps opens with the ' +
+            'driving route to it, given that one place, only when tapped.',
           tags: ['drivers', 'design'],
-        },
-        {
-          icon: 'map-pin',
-          title: 'Directions in one tap',
-          text:
-            'Each stop still ahead has Directions: Google Maps opens with the driving route to it, ' +
-            'because Maps knows the roads and the traffic. It is given that one place, only when tapped.',
-          tags: ['drivers', 'safety'],
         },
         {
           icon: 'sos',
@@ -207,16 +201,8 @@ window.GTS_UPDATES = {
           text:
             "GTS staff see the parent's name and number, their child on that trip, the driver with " +
             "the van's plate and their number, and where the van was — with Call parent, Call driver and Open map. " +
-            'The list says how long ago each SOS was raised.',
-          tags: ['safety', 'design'],
-        },
-        {
-          icon: 'shield',
-          title: 'Closing an SOS asks first',
-          text:
-            '"Close this SOS? Close it only after checking with the parent that everyone is safe." ' +
-            "Close request moved under the conversation, so the screen's title stays whole at the " +
-            'largest text size.',
+            'The list says how long ago each SOS was raised, and closing one asks first: check with ' +
+            'the parent that everyone is safe.',
           tags: ['safety', 'design'],
         },
         {
@@ -238,15 +224,6 @@ window.GTS_UPDATES = {
           tags: ['parents', 'drivers', 'design'],
         },
         {
-          icon: 'camera',
-          title: 'Maps that look right on video',
-          text:
-            "Last week's video showed the map blurred and jerky. This week's was filmed with the " +
-            "test phone's graphics chip on and recorded at twice the frames: the map is sharp and the " +
-            'van glides.',
-          tags: ['design', 'tech'],
-        },
-        {
           icon: 'file',
           title: "A driver's photo is kept when the phone closes GTS",
           text:
@@ -255,6 +232,34 @@ window.GTS_UPDATES = {
             'again by itself and adds the photo. Testing it found one more thing, fixed too: a new ' +
             'driver who reopened GTS saw "Still trying to reach GTS" and nothing else.',
           tags: ['drivers', 'tech'],
+        },
+        {
+          icon: 'route',
+          title: 'A live map, like a navigation app',
+          text:
+            "The trip map now follows the van: it moves smoothly between updates, with a notch " +
+            'showing which way it drives. A button opens the map full screen, where you can move ' +
+            'it around; Back to the van brings it back. For parents and drivers.',
+          tags: ['parents', 'drivers', 'design'],
+        },
+        {
+          icon: 'shield',
+          title: "Clearer screens, and trust first on a driver's card",
+          text:
+            'While GTS loads, a screen shows the shape of what is coming, then "Still trying to ' +
+            'reach GTS" if it takes long; an empty list shows an icon and one sentence. Each ' +
+            "driver's card in Find a driver says Papers checked by GTS — tap it to see what was " +
+            'checked — and New driver while they have fewer than 5 ratings.',
+          tags: ['parents', 'safety', 'design'],
+        },
+        {
+          icon: 'language',
+          title: 'Right to left, day or night, and room for every script',
+          text:
+            'In Urdu, Kashmiri and Sindhi the whole app reads right to left. Settings has Day or ' +
+            'night (or like the phone). Every Indian language gets taller lines, so its letters ' +
+            'never touch a button. A phone set to a language GTS does not have now opens in English.',
+          tags: ['design'],
         },
         {
           icon: 'code',
@@ -289,6 +294,15 @@ window.GTS_UPDATES = {
         { src: 'assets/updates/2026-11-01/nov1-13-notification-shade.jpg', caption: "The van in the status bar and the shade: a driver's reminder and the running trip", group: 'Notifications and the icon' },
         { src: 'assets/updates/2026-11-01/nov1-14-themed-icon.jpg', caption: "With Android's themed icons on, GTS's van takes the wallpaper's colours like the other apps", group: 'Notifications and the icon' },
         { src: 'assets/updates/2026-11-01/nov1-15-driver-photo-kept.jpg', caption: 'Android closed GTS while the camera was open: GTS opened the papers again and added the front photo', group: "Drivers' papers" },
+        { src: 'assets/updates/2026-11-01/nov1-16-live-map-card.jpg', caption: "The parent's live trip, Map: the van in the middle with a notch for its heading, the camera following it", group: 'The live map' },
+        { src: 'assets/updates/2026-11-01/nov1-17-live-map-full-screen.jpg', caption: 'Full screen, after a drag: the map stays where it was put, the van moves on its street; Back to the van', group: 'The live map' },
+        { src: 'assets/updates/2026-11-01/nov1-18-live-map-driver-followed.jpg', caption: "The driver's map full screen, zoomed in, following the van again", group: 'The live map' },
+        { src: 'assets/updates/2026-11-01/nov1-19-loading-still-trying.jpg', caption: 'Waiting for GTS: the shape of the list, then "Still trying to reach GTS" after 10 seconds', group: 'Loading, empty and trust' },
+        { src: 'assets/updates/2026-11-01/nov1-20-empty-offers.jpg', caption: 'Nothing yet: an icon and one sentence, in the middle of the screen', group: 'Loading, empty and trust' },
+        { src: 'assets/updates/2026-11-01/nov1-21-driver-card-trust.jpg', caption: "A driver's card: Papers checked by GTS, 5.0 ★ (1) and New driver, the children who ride and the school", group: 'Loading, empty and trust' },
+        { src: 'assets/updates/2026-11-01/nov1-22-urdu-right-to-left.jpg', caption: "The driver's trip in Urdu: the whole screen reads right to left, Directions under the name", group: 'Languages and looks' },
+        { src: 'assets/updates/2026-11-01/nov1-23-settings-day-or-night.jpg', caption: 'Settings, Day or night: Night chosen, GTS dark at once', group: 'Languages and looks' },
+        { src: 'assets/updates/2026-11-01/nov1-24-kannada-largest-text.jpg', caption: 'Kannada at the largest text size: taller lines, every label clear of its button', group: 'Languages and looks' },
       ],
       galleryNote:
         'The video and the phone stills are filmed on test phones (virtual Android phones on the ' +
