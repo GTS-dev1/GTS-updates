@@ -148,9 +148,9 @@ window.GTS_UPDATES = {
       { id: 'monthly-fees', label: 'Monthly fees', detail: 'By UPI or cash, recorded and confirmed', icon: 'calendar', status: 'done' },
       { id: 'messages', label: 'Messages, ratings', detail: 'A chat per child; parents rate trips', icon: 'chat', status: 'done' },
       { id: 'languages', label: 'Languages', detail: 'English and 22 Indian languages', icon: 'language', status: 'done' },
-      { id: 'alerts', label: 'Alerts', detail: 'Push with GTS closed, no signal, SOS', icon: 'bell', status: 'now' },
-      { id: 'settings-privacy', label: 'Settings & privacy', detail: 'Account deletion, grievance, help desk', icon: 'settings', status: 'next' },
-      { id: 'cloud-backend', label: 'Cloud backend', detail: 'Firebase in Mumbai: push, real SMS', icon: 'code', status: 'planned' },
+      { id: 'alerts', label: 'Alerts', detail: 'Push with GTS closed, no signal, SOS', icon: 'bell', status: 'done' },
+      { id: 'settings-privacy', label: 'Settings & privacy', detail: 'Account deletion, grievance, help desk', icon: 'settings', status: 'now' },
+      { id: 'cloud-backend', label: 'Cloud backend', detail: 'Firebase in Mumbai: push, real SMS', icon: 'code', status: 'next' },
       { id: 'phone-testing', label: 'Testing on phones', detail: 'Many Android phones, real roads', icon: 'check', status: 'planned' },
       { id: 'pilot', label: 'Pilot', detail: 'Real families, real school runs', icon: 'school', status: 'planned' },
       { id: 'trip-records', label: 'Trip records', detail: 'A month of trips at a glance', icon: 'file', status: 'later' },
@@ -161,6 +161,321 @@ window.GTS_UPDATES = {
 
   /** One entry per week, newest first. Paste a new week ABOVE the first one. */
   weeks: [
+    {
+      id: '2026-11-09',
+      dateLabel: '2–9 November 2026',
+      title: "Finding a ride and paying for it end to end, a clearer SOS, and settings that say what GTS knows",
+      summary:
+        "Finding a ride and paying for it now work end to end on test phones: a parent asks nearby drivers, a driver offers a monthly fee, they agree, and each month's payment is recorded and confirmed. An SOS is held to raise, and the live trip says 'SOS raised' until GTS Support closes it. Settings now show what GTS knows about you, deleting an account is said plainly and can be undone for 30 days, and every screen and dialog was checked at the largest text size.",
+      phase: 'settings-privacy',
+      progress: {
+        estimates: [
+          { label: 'First release (pilot)', value: 'about 60%' },
+          { label: 'Whole product', value: 'about 55%' },
+        ],
+        note:
+          "Up five on each: finding a ride, monthly fees, SOS and settings were walked end to end on test phones and a full code review closed. What moves the total most is still ahead: the cloud backend and a run on real phones",
+      },
+      highlights: [
+        {
+          icon: 'search',
+          title: "Finding a ride, end to end",
+          text:
+            "A parent asks drivers near the school; a driver answers with a monthly offer; either can counter, and once they agree the parent adds their child. Drivers see only the area, never the family's name or home.",
+          tags: ['parents', 'drivers'],
+        },
+        {
+          icon: 'calendar',
+          title: "The monthly fee",
+          text:
+            "The pay sheet says to whom and for which month first, then UPI or cash; the payment waits for the driver to confirm and then shows both dates. A driver can also show a QR code to be paid in person. GTS never holds the money.",
+          tags: ['parents', 'drivers'],
+        },
+        {
+          icon: 'sos',
+          title: "A clearer SOS",
+          text:
+            "Pick what is happening, then hold the button for three seconds — a quick tap raises nothing. Back on the live trip, 'SOS raised' stays above the SOS button until GTS Support closes it, and each request says where it has got to: opened, seen by GTS, replied, closed.",
+          tags: ['parents', 'safety'],
+        },
+        {
+          icon: 'van',
+          title: "On board",
+          text:
+            "After the pickup, the parent's live trip says 'On board' and shows the distance to the school by name — it used to say 'Arrived' all the way to school.",
+          tags: ['parents'],
+        },
+        {
+          icon: 'settings',
+          title: "Settings and your data",
+          text:
+            "Settings are groups that each say how they are set. 'What GTS knows about you' lists it all. Deleting an account is said plainly and confirmed on purpose, and for 30 days it can be kept after a change of mind.",
+          tags: ['parents', 'drivers', 'safety'],
+        },
+        {
+          icon: 'chat',
+          title: "Messages",
+          text:
+            "Swipe a message to reply and the answer quotes it; one tick when sent, two when delivered.",
+          tags: ['parents', 'drivers'],
+        },
+        {
+          icon: 'sparkle',
+          title: "Screens that move well",
+          text:
+            "Things move on springs, pages slide on Android's predictive back, busy buttons show a moving shape, and a child's card grows into the live trip. With battery saver on, everything stays calm.",
+          tags: ['design'],
+        },
+        {
+          icon: 'language',
+          title: "Every language, every text size",
+          text:
+            "Every confirm dialog was checked in all 23 languages at Android's largest text: dialogs are wider and scroll, so words stay whole. Android's notification categories now follow a language change at once. Back on a form with something typed asks before dropping it.",
+          tags: ['design', 'tech'],
+        },
+        {
+          icon: 'shield',
+          title: "A full check of the week",
+          text:
+            "A full code review of everything since 20 October closed with every finding fixed or decided, and three walks on test phones went through each new screen, as parent, driver and GTS staff.",
+          tags: ['tech', 'safety'],
+        },
+      ],
+      galleryNote: "Shown as filmed on test phones; every name, number, place and fee is made-up test data.",
+      cover: 'assets/updates/2026-11-09/nov9-22-on-board.jpg',
+      gallery: [
+        {
+          src: 'assets/updates/2026-11-09/nov9-01-find-a-driver.jpg',
+          caption: "Find a driver: the school's gate and roughly where home is — drivers only ever see the area",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-02-asked.jpg',
+          caption: "A driver nearby, papers checked by GTS, with their rating — asked in one tap",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-03-driver-asked.jpg',
+          caption: "The driver sees 'A parent asked' — no name, no home",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-04-driver-offered.jpg',
+          caption: "The driver's monthly offer, in the same thread",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-05-parent-offer.jpg',
+          caption: "The parent can accept, counter or decline",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-06-parent-countered.jpg',
+          caption: "A counter-offer: the thread keeps every step with its date",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-07-driver-agreed.jpg',
+          caption: "Agreed — the driver's side",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-08-parent-agreed.jpg',
+          caption: "Agreed — the parent adds their child next",
+          group: "Finding a ride",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-09-fee-card.jpg',
+          caption: "This month's fee on the parent's home",
+          group: "Monthly fees",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-10-pay-sheet.jpg',
+          caption: "Pay: to whom and for which month first, then UPI or cash — GTS never holds the money",
+          group: "Monthly fees",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-11-paid-by-upi.jpg',
+          caption: "Paid by UPI: recorded, waiting for the driver to confirm",
+          group: "Monthly fees",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-12-driver-to-confirm.jpg',
+          caption: "The driver confirms they received it",
+          group: "Monthly fees",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-13-confirmed.jpg',
+          caption: "Confirmed, with the date",
+          group: "Monthly fees",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-14-code-typed.jpg',
+          caption: "A parent with no child yet types the driver's invite code right on home",
+          group: "Children",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-15-driver-card.jpg',
+          caption: "The driver's card before joining: the vehicle, the rating, approved by GTS",
+          group: "Children",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-16-add-child.jpg',
+          caption: "Adding a child: first name, pickup point and the parent's consent",
+          group: "Children",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-17-two-cards.jpg',
+          caption: "Two children, each with their own card",
+          group: "Children",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-18-edit-child.jpg',
+          caption: "Edit child: the pickup point says 'Saved earlier' (it said 'Pinned on the map' even when set by GPS — fixed 9 November)",
+          group: "Children",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-19-on-the-way.jpg',
+          caption: "Home during a trip: On the way, with See live",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-20-picked-up.jpg',
+          caption: "'Picked up' arrives as a notification over the live map (this screen still said 'Arrived' after a pickup — fixed the next day: 'On board')",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-21-full-screen-map.jpg',
+          caption: "The live map, full screen",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-22-on-board.jpg',
+          caption: "On board: the distance to school by name, and about how long (new 9 November)",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-23-no-connection.jpg',
+          caption: "No connection: GTS says so and shows what it knew last (behind it, the 'Arrived' fixed the next day)",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-24-reached-school.jpg',
+          caption: "Reached school: live tracking closes",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-25-todays-alerts.jpg',
+          caption: "Today's alerts, grouped by trip",
+          group: "The live trip",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-26-reply-quote.jpg',
+          caption: "Swipe a message to reply: the answer quotes it",
+          group: "Messages",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-27-sent.jpg',
+          caption: "Sent: one tick",
+          group: "Messages",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-28-delivered.jpg',
+          caption: "Delivered: two ticks",
+          group: "Messages",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-29-messages-list.jpg',
+          caption: "Messages: a chat for each child, with New",
+          group: "Messages",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-30-sos-form.jpg',
+          caption: "SOS: pick what is happening, then hold to raise — a quick tap raises nothing",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-31-sos-raised.jpg',
+          caption: "SOS raised: call 112, message emergency contacts, call the driver",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-32-live-sos-raised.jpg',
+          caption: "Back on the live trip: 'SOS raised' above the SOS button until GTS Support closes it (new 9 November)",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-33-sos-request.jpg',
+          caption: "The SOS in Help & Support, saying where it has got to",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-34-request-timeline.jpg',
+          caption: "A request's timeline: opened, seen by GTS, replied, closed",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-35-staff-inbox.jpg',
+          caption: "GTS staff: an SOS first, with how long ago it was raised",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-36-close-request.jpg',
+          caption: "Staff close a request only after a question",
+          group: "SOS and help",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-37-how-was.jpg',
+          caption: "After a trip: 'How was today's trip?' on home",
+          group: "Ratings",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-38-rate.jpg',
+          caption: "Stars, a few tags and a few words",
+          group: "Ratings",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-39-your-ratings.jpg',
+          caption: "The driver's ratings — never who wrote them",
+          group: "Ratings",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-40-settings.jpg',
+          caption: "Settings as groups, each saying how it is set",
+          group: "Settings, account and large text",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-41-motion.jpg',
+          caption: "Motion and battery: calm while battery saver is on",
+          group: "Settings, account and large text",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-42-notification-categories.jpg',
+          caption: "Android's notification categories in Kannada ('GTS trip in progress' stayed English until the next trip — fixed 9 November: it follows the language at once)",
+          group: "Settings, account and large text",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-43-delete-account.jpg',
+          caption: "Deleting an account, said plainly — and it can be kept for 30 days after a change of mind",
+          group: "Settings, account and large text",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-44-leave-without-saving.jpg',
+          caption: "Back on a form with something typed asks first (new 9 November)",
+          group: "Settings, account and large text",
+        },
+        {
+          src: 'assets/updates/2026-11-09/nov9-45-largest-text-dialog.jpg',
+          caption: "At Android's largest text, dialogs keep every word whole (new 9 November)",
+          group: "Settings, account and large text",
+        },
+      ],
+      next: [
+        "A run on a real phone, every journey",
+        "The cloud backend in Mumbai, so alerts arrive with GTS closed",
+        "Native speakers check the Kannada, Malayalam and Tamil wording that is too long at the largest text",
+      ],
+    },
     {
       id: '2026-11-01',
       dateLabel: '25 October – 1 November 2026',
